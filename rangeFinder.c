@@ -175,8 +175,6 @@ void getButtonPress(void *buttonPort) {
                 signalSentFlag = 0;
             }
         }
-        //Read buttons every 10 milliseconds
-        msleep(10);
     }
 }
 
