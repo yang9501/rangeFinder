@@ -15,6 +15,9 @@
 
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
 
+//Writes specified value to specified GPIO directory
+static void writeGPIO(char *filename, char *port, char *value);
+
 //Reads input to GPIO pin
 static uint32_t readGPIO(char *filename, char *port);
 
@@ -43,7 +46,7 @@ int main(void) {
     (void) printf("%s\n", sysInfo.nodename);
     (void) printf("%s\n", sysInfo.machine);
     #else
-    (void) writeLED("/direction", buttonPorts, "in");
+    (void) writeGPIO("/direction", buttonPorts, "in");
     #endif
 
     //Initialize mutexes
@@ -186,4 +189,13 @@ static uint32_t readGPIO(char *filename, char *port) {
     (void) fscanf(fp, "%d", &val);
     (void) fclose(fp);
     return val;
+}
+
+static void writeGPIO(char *filename, char *port, char *value) {
+    FILE* fp; //create file pointer
+    char fullFileName[100]; //store path and filename
+    (void) sprintf(fullFileName, "%s%s", port, filename); //write path/name
+    fp = fopen(fullFileName, "w+"); //open file for writing
+    (void) fprintf(fp, "%s", value); // send value to the file
+    (void) fclose(fp); //close the file using the file pointer
 }
