@@ -144,35 +144,15 @@ void getButtonPress(void *buttonPort) {
             //first press detected
             if(pressedFlag == 0) {
                 pressedFlag = 1;
-                if(signalSentFlag == 0) {
-                    //If the buttonPort corresponds with start/stop
-                    if(strcmp((char*) buttonPort,  GPIO_PATH_66) == 0) {
-                        printf("hello\n");
-                        fflush(stdout);
-                        signalSentFlag = 1;
-                        /*
-                        (void) pthread_mutex_lock(&runningStateMutex);
-                        //if the watch is currently running, stop it
-                        if(watchRunningState == 1) {
-                            (void) pthread_mutex_unlock(&runningStateMutex);
-                            stopWatch();
-                            signalSentFlag = 1;
-                        }
-                        //if the watch is currently stopped, start it
-                        else if(watchRunningState == 0) {
-                            (void) pthread_mutex_unlock(&runningStateMutex);
-                            startWatch();
-                            signalSentFlag = 1;
-                        }*/
-                    }
-                }
+                //If the buttonPort corresponds with start/stop
+                printf("hello\n");
+                fflush(stdout);
             }
         }
         if(gpioValue == 0) {
             //if the button is let go after being pressed
             if(pressedFlag == 1) {
                 pressedFlag = 0;
-                signalSentFlag = 0;
             }
         }
     }
