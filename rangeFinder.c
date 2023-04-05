@@ -36,7 +36,7 @@ int watchRunningState;
 
 int main(void) {
     //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
-	char buttonPorts[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
+	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
 
     #ifdef DEBUG
     (void) printf("DEBUG MODE\n");
@@ -46,7 +46,7 @@ int main(void) {
     (void) printf("%s\n", sysInfo.nodename);
     (void) printf("%s\n", sysInfo.machine);
     #else
-    (void) writeGPIO("/direction", buttonPorts, "in");
+    (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
     //Initialize mutexes
@@ -81,7 +81,7 @@ int main(void) {
     pthread_attr_setschedparam(&tattr3, &param3);
     pthread_attr_setschedparam(&tattr4, &param4);
 
-    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPorts[0]);
+    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //(void) pthread_create( &thread3, &tattr3, (void *) updateTimerThread, NULL);
     //(void) pthread_create( &thread4, &tattr4, (void *) displayTimerThread, NULL);
 
