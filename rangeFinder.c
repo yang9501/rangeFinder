@@ -145,7 +145,7 @@ void getButtonPress(void *buttonPort) {
             if(pressedFlag == 0) {
                 pressedFlag = 1;
                 //If the buttonPort corresponds with start/stop
-                printf("hello\n");
+                printf("hellosuip\n");
                 fflush(stdout);
             }
         }
