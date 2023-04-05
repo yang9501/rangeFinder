@@ -21,8 +21,6 @@ static uint32_t readGPIO(char *filename, char *port);
 //Primary button press detection
 void getButtonPress(void *buttonPort);
 
-void startWatch();
-void stopWatch();
 void msleep(long msec);
 void updateTimerThread();
 void displayTimerThread();
@@ -131,38 +129,6 @@ void displayTimerThread() {
         //update terminal display every 100 milliseconds
         msleep(100);
     }
-}
-
-//Modifies running state to 'on', toggles lights
-void startWatch() {
-    (void) pthread_mutex_lock(&runningStateMutex);
-    watchRunningState = 1;
-    #ifdef DEBUG
-    (void) printf("Green on: %s\n", GPIO_PATH_44);
-    (void) printf("Red off: %s\n", GPIO_PATH_68);
-    #else
-    (void) writeLED("/value", GPIO_PATH_44, "1");
-    (void) writeLED("/value", GPIO_PATH_68, "0");
-    #endif
-    (void) pthread_mutex_unlock(&runningStateMutex);
-}
-
-//Modifies running state to 'off', toggles lights, and displays timer at stoppage
-void stopWatch() {
-    (void) pthread_mutex_lock(&runningStateMutex);
-    watchRunningState = 0;
-    #ifdef DEBUG
-    (void) printf("Green off: %s\n", GPIO_PATH_44);
-    (void) printf("Red on: %s\n", GPIO_PATH_68);
-    #else
-    (void) writeLED("/value", GPIO_PATH_44, "0");
-    (void) writeLED("/value", GPIO_PATH_68, "1");
-    #endif
-    (void) pthread_mutex_unlock(&runningStateMutex);
-    (void) pthread_mutex_lock(&timerMutex);
-    printf("%.2f\n", timerInMilliseconds/1000.0f);
-    fflush(stdout);
-    (void) pthread_mutex_unlock(&timerMutex);
 }
 
 void getButtonPress(void *buttonPort) {
