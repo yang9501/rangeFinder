@@ -38,6 +38,8 @@ char uartReadBuffer2[64];
 char uartReadBuffer3[64];
 char uartReadBuffer4[64];
 
+struct termios tty;
+
 int main(void) {
     //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
@@ -76,6 +78,40 @@ int main(void) {
         printf("Error %i from open: %s\n", errno, strerror(errno));
     }
 
+    if(tcgetattr(serialPort, &tty) != 0) {
+        printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+    }
+    tty.c_cflag &= ~PARENB;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag |= CS8;
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag |= CREAD | CLOCAL;
+    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ECHO; // Disable echo
+    tty.c_lflag &= ~ECHOE; // Disable erasure
+    tty.c_lflag &= ~ECHONL;
+    tty.c_lflag &= ~ISIG;
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL);
+    tty.c_oflag &= ~OPOST;
+    tty.c_oflag &= ~ONLCR;
+
+    cfsetispeed(&tty, B9600);
+    cfsetospeed(&tty, B9600);
+
+    if (tcsetattr(serialPort, TCSANOW, &tty) != 0) {
+        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+    }
+    char read_buf [256];
+
+    int n = read(serialPort, &read_buf, sizeof(read_buf));
+
+    if (num_bytes < 0) {
+        printf("Error reading: %s", strerror(errno));
+        return 1;
+    }
+
+    printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
 
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
