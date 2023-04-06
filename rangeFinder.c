@@ -52,6 +52,7 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
+    /*(
     char uartReadBuffer0[64] = "";
     char uartReadBuffer1[64] = "";
     char uartReadBuffer2[64] = "";
@@ -65,7 +66,14 @@ int main(void) {
     fflush(stdout);
     uartRead(1);
     printf(uartReadBuffer1);
-    fflush(stdout);
+    fflush(stdout);*/
+
+    int serialPort = open("/dev/ttyS1", O_RDWR);
+
+    // Check for errors
+    if (serialPort < 0) {
+        printf("Error %i from open: %s\n", errno, strerror(errno));
+    }
 
 
     //Initialize mutexes
