@@ -38,7 +38,6 @@ char uartReadBuffer2[64];
 char uartReadBuffer3[64];
 char uartReadBuffer4[64];
 
-void serial_readln(char *buffer, int len);
 
 struct termios tty;
 int serialPort = -1;
@@ -129,28 +128,6 @@ int main(void) {
 	return 0;
 }
 
-// Read a line from UART.
-// Return a 0 len string in case of problems with UART
-void serial_readln(char *buffer, int len)
-{
-    char c;
-    char *b = buffer;
-    int rx_length = -1;
-    while(1) {
-        rx_length = read(uart0_filestream, (void*)(&c), 1);
-
-        if (rx_length <= 0) {
-            //wait for messages
-            sleep(1);
-        } else {
-            if (c == '\n') {
-                *b++ = '\0';
-                break;
-            }
-            *b++ = c;
-        }
-    }
-}
 
 
 void getButtonPress(void *buttonPort) {
