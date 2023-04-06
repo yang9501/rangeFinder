@@ -38,6 +38,8 @@ char uartReadBuffer2[64];
 char uartReadBuffer3[64];
 char uartReadBuffer4[64];
 
+void serial_readln(char *buffer, int len);
+
 struct termios tty;
 int serialPort = -1;
 
@@ -56,7 +58,7 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
 
     // Check for errors
     if (serialPort < 0) {
@@ -68,9 +70,9 @@ int main(void) {
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
-    options.c_lflag = 0;
+    options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
     tcflush(serialPort, TCIFLUSH);
-    tcsetattr(serialPort, TCSANOW, &options);
+    tcsetattr(, TCSANOW, &options);
 
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
@@ -127,6 +129,28 @@ int main(void) {
 	return 0;
 }
 
+// Read a line from UART.
+// Return a 0 len string in case of problems with UART
+void serial_readln(char *buffer, int len)
+{
+    char c;
+    char *b = buffer;
+    int rx_length = -1;
+    while(1) {
+        rx_length = read(uart0_filestream, (void*)(&c), 1);
+
+        if (rx_length <= 0) {
+            //wait for messages
+            sleep(1);
+        } else {
+            if (c == '\n') {
+                *b++ = '\0';
+                break;
+            }
+            *b++ = c;
+        }
+    }
+}
 
 
 void getButtonPress(void *buttonPort) {
