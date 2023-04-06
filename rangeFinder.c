@@ -71,7 +71,7 @@ int main(void) {
     options.c_oflag = 0;
     options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
     tcflush(serialPort, TCIFLUSH);
-    tcsetattr(, TCSANOW, &options);
+    tcsetattr(serialPort, TCSANOW, &options);
 
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
