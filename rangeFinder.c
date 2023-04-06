@@ -111,7 +111,7 @@ int main(void) {
         return 1;
     }
 
-    printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
+    printf("Read %i bytes. Received message: %s", n, read_buf);
 
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
