@@ -79,15 +79,16 @@ int main(void) {
     }
     char read_buf [256];
     usleep(100000);
-    int n = read(serialPort, &read_buf, sizeof(read_buf));
+    while(1) {
+        int n = read(serialPort, &read_buf, sizeof(read_buf));
 
-    if (n < 0) {
-        printf("Error reading: %s", strerror(errno));
-        return 1;
+        if (n < 0) {
+            printf("Error reading: %s", strerror(errno));
+            return 1;
+        }
+
+        printf("Read %i bytes. Received message: %s", n, read_buf);
     }
-
-    printf("Read %i bytes. Received message: %s", n, read_buf);
-
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
     (void) pthread_mutex_init(&timerMutex, NULL);
