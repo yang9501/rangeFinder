@@ -10,6 +10,8 @@
 #include <float.h>
 #include <sched.h>
 #include <errno.h>
+#include <termios.h>
+#include <sys/types.h>
 
 //comment out to live run
 //#define DEBUG 1
