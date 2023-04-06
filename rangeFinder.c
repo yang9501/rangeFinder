@@ -9,7 +9,6 @@
 #include <time.h>
 #include <float.h>
 #include <sched.h>
-#include "uart.h"
 #include <errno.h>
 
 //comment out to live run
@@ -57,7 +56,7 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
 
     // Check for errors
     if (serialPort < 0) {
