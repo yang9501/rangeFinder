@@ -9,7 +9,7 @@
 #include <time.h>
 #include <float.h>
 #include <sched.h>
-#include <../uart.h>
+#include <./uart.h>
 
 //comment out to live run
 //#define DEBUG 1
