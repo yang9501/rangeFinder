@@ -69,8 +69,8 @@ int main(void) {
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
     options.c_lflag = 0;
-    tcflush(uart0_filestream, TCIFLUSH);
-    tcsetattr(uart0_filestream, TCSANOW, &options);
+    tcflush(serialPort, TCIFLUSH);
+    tcsetattr(serialPort, TCSANOW, &options);
 
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
