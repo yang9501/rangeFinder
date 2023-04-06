@@ -147,7 +147,7 @@ unsigned char uartInitialize(int uartNumber, int baudRate)
     }
     fflush(uart);
     fclose(uart);*/
-    strcat(buf, "O1");
+    strcat(buf, "S1");
     //  Open uart port for UART tx/rx
     switch(uartNumber){
         case 0:
