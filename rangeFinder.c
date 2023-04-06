@@ -57,7 +57,7 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
 
     // Check for errors
     if (serialPort < 0) {
@@ -77,7 +77,7 @@ int main(void) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
     char read_buf [256];
-    usleep(1000);
+    usleep(100000);
     int n = read(serialPort, &read_buf, sizeof(read_buf));
 
     if (n < 0) {
