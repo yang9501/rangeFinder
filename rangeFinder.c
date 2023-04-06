@@ -31,6 +31,12 @@ float timerInMilliseconds;
 pthread_mutex_t runningStateMutex;
 int watchRunningState;
 
+char uartReadBuffer0[64];
+char uartReadBuffer1[64];
+char uartReadBuffer2[64];
+char uartReadBuffer3[64];
+char uartReadBuffer4[64];
+
 int main(void) {
     //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
@@ -46,7 +52,12 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    char uartReadBuffer1[64];
+    char uartReadBuffer0[64] = "";
+    char uartReadBuffer1[64] = "";
+    char uartReadBuffer2[64] = "";
+    char uartReadBuffer3[64] = "";
+    char uartReadBuffer4[64] = "";
+
     printf("hello\n");
     fflush(stdout);
     uartInitialize(1, 9600);
