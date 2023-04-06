@@ -9,6 +9,7 @@
 #include <time.h>
 #include <float.h>
 #include <sched.h>
+#include <uart.h>
 
 //comment out to live run
 //#define DEBUG 1
@@ -23,10 +24,6 @@ static uint32_t readGPIO(char *filename, char *port);
 
 //Primary button press detection
 void getButtonPress(void *buttonPort);
-
-void msleep(long msec);
-void updateTimerThread();
-void displayTimerThread();
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
@@ -48,7 +45,14 @@ int main(void) {
     #else
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
-
+    printf("hello\n");
+    fflush(stdout);
+    uartInitialize(1, 9600);
+    printf("hi\n");
+    fflush(stdout);
+    uartRead(1);
+    printf(uartReadBuffer1);
+    fflush(stdout);
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
     (void) pthread_mutex_init(&timerMutex, NULL);
@@ -90,49 +94,7 @@ int main(void) {
 	return 0;
 }
 
-//Sleep for the requested number of milliseconds
-void msleep(long milliseconds) {
-    struct timespec ts;
 
-    ts.tv_sec = milliseconds / 1000;
-    ts.tv_nsec = (milliseconds % 1000) * 1000000;
-    nanosleep(&ts, &ts);
-}
-
-//Updates the timer counter every 10ms.  When timer reaches the max of float value, rolls over to 0.
-void updateTimerThread() {
-    while(1) {
-        (void) pthread_mutex_lock(&runningStateMutex);
-        if(watchRunningState == 1) {
-            (void) pthread_mutex_lock(&timerMutex);
-            //If the counter value + 10 would be greater than the maximum value of float, rollover to zero
-            if(FLT_MAX - 10 < timerInMilliseconds) {
-                timerInMilliseconds = 0.0f;
-            }
-            timerInMilliseconds = timerInMilliseconds + 10.0f;
-            (void) pthread_mutex_unlock(&timerMutex);
-        }
-        (void) pthread_mutex_unlock(&runningStateMutex);
-        //Maintain to resolution of 10 milliseconds
-        msleep(10);
-    }
-}
-
-//Outputs timer to stdout every 100ms when running state is 'on'
-void displayTimerThread() {
-    while(1) {
-        (void) pthread_mutex_lock(&runningStateMutex);
-        if (watchRunningState == 1) {
-            (void) pthread_mutex_lock(&timerMutex);
-            printf("%.1f\n", timerInMilliseconds/1000.0f);
-            fflush(stdout);
-            (void) pthread_mutex_unlock(&timerMutex);
-        }
-        (void) pthread_mutex_unlock(&runningStateMutex);
-        //update terminal display every 100 milliseconds
-        msleep(100);
-    }
-}
 
 void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
