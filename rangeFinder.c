@@ -10,6 +10,7 @@
 #include <float.h>
 #include <sched.h>
 #include "uart.h"
+#include <errno.h>
 
 //comment out to live run
 //#define DEBUG 1
