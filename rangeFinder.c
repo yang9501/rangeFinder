@@ -66,6 +66,8 @@ int main(void) {
     uartRead(1);
     printf(uartReadBuffer1);
     fflush(stdout);
+
+
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
     (void) pthread_mutex_init(&timerMutex, NULL);

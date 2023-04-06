@@ -25,8 +25,8 @@
 // Added another condition in uartInitialize function to take care of both conditions and
 // choose whichever cape is present. (Priority given to bone_capemgr.9)
 // Define the beaglebone black cape. The cape manager may be 8 or 9
-#define BONEPATH_9	"/sys/devices/bone_capemgr.9/slots"
-#define BONEPATH_8	"/sys/devices/bone_capemgr.8/slots"
+#define BONEPATH_9	//"/sys/devices/bone_capemgr.9/slots"
+#define BONEPATH_8	//"/sys/devices/bone_capemgr.8/slots"
 
 //UART config using termios
 struct termios uartTermios,oldDescriptor;
@@ -108,6 +108,7 @@ unsigned char uartInitialize(int uartNumber, int baudRate)
 
     // Open the slot for UART
     // Try for bone_capemgr.9 first
+    /*
     uart = fopen(BONEPATH_9, "w");
     if(uart == NULL){
         printf("bone_capemgr.9 doesn't exist. Trying bone_capemgr.8");
@@ -145,8 +146,8 @@ unsigned char uartInitialize(int uartNumber, int baudRate)
             return UART_NUMBER_INCORRECT;
     }
     fflush(uart);
-    fclose(uart);
-
+    fclose(uart);*/
+    strcat(buf, "O1");
     //  Open uart port for UART tx/rx
     switch(uartNumber){
         case 0:
