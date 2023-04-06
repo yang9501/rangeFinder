@@ -45,6 +45,8 @@ int main(void) {
     #else
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
+
+    char uartReadBuffer1[64];
     printf("hello\n");
     fflush(stdout);
     uartInitialize(1, 9600);
