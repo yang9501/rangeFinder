@@ -64,7 +64,7 @@ int main(void) {
     }
 
     struct termios options;
-    tcgetattr(uart0_filestream, &options);
+    tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
