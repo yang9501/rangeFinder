@@ -77,7 +77,7 @@ int main(void) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
     char read_buf [256];
-
+    usleep(1000);
     int n = read(serialPort, &read_buf, sizeof(read_buf));
 
     if (n < 0) {
