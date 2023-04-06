@@ -39,6 +39,7 @@ char uartReadBuffer3[64];
 char uartReadBuffer4[64];
 
 struct termios tty;
+int serialPort = -1;
 
 int main(void) {
     //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
@@ -55,51 +56,23 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    /*(
-    char uartReadBuffer0[64] = "";
-    char uartReadBuffer1[64] = "";
-    char uartReadBuffer2[64] = "";
-    char uartReadBuffer3[64] = "";
-    char uartReadBuffer4[64] = "";
-
-    printf("hello\n");
-    fflush(stdout);
-    uartInitialize(1, 9600);
-    printf("hi\n");
-    fflush(stdout);
-    uartRead(1);
-    printf(uartReadBuffer1);
-    fflush(stdout);*/
-
-    int serialPort = open("/dev/ttyS1", O_RDWR);
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
 
     // Check for errors
     if (serialPort < 0) {
         printf("Error %i from open: %s\n", errno, strerror(errno));
     }
 
-    if(tcgetattr(serialPort, &tty) != 0) {
-        printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
-    }
-    tty.c_cflag &= ~PARENB;
-    tty.c_cflag &= ~CSTOPB;
-    tty.c_cflag |= CS8;
-    tty.c_cflag &= ~CRTSCTS;
-    tty.c_cflag |= CREAD | CLOCAL;
-    tty.c_lflag &= ~ICANON;
-    tty.c_lflag &= ~ECHO; // Disable echo
-    tty.c_lflag &= ~ECHOE; // Disable erasure
-    tty.c_lflag &= ~ECHONL;
-    tty.c_lflag &= ~ISIG;
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL);
-    tty.c_oflag &= ~OPOST;
-    tty.c_oflag &= ~ONLCR;
+    struct termios options;
+    tcgetattr(uart0_filestream, &options);
+    options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    options.c_iflag = IGNPAR;
+    options.c_oflag = 0;
+    options.c_lflag = 0;
+    tcflush(uart0_filestream, TCIFLUSH);
+    tcsetattr(uart0_filestream, TCSANOW, &options);
 
-    cfsetispeed(&tty, B9600);
-    cfsetospeed(&tty, B9600);
-
-    if (tcsetattr(serialPort, TCSANOW, &tty) != 0) {
+    if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
     char read_buf [256];
