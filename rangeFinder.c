@@ -106,7 +106,7 @@ int main(void) {
 
     int n = read(serialPort, &read_buf, sizeof(read_buf));
 
-    if (num_bytes < 0) {
+    if (n < 0) {
         printf("Error reading: %s", strerror(errno));
         return 1;
     }
