@@ -144,7 +144,7 @@ void readGPS() {
             //int n = read(serialPort, &read_buf, sizeof(read_buf));
             int n = read(uart0_filestream, (void *) (&c), 1);
             if (n < 0) {
-                printf("Error %i from open: %s\n", errno, strerror(errno));
+                
             } else {
                 if (c == '\n') {
                     *b++ = '\0';
