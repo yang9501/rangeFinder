@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/types.h>
-#include "./libgps-master/gps.h"
 
 //comment out to live run
 //#define DEBUG 1
@@ -103,14 +102,6 @@ int main(void) {
 }
 
 void readGPS() {
-    gps_init();
-    loc_t data;
-
-    while (1) {
-        gps_location(&data);
-
-        printf("%lf %lf\n", data.latitude, data.longitude);
-    }
     //Begin GPS UART Read code
     /////////////////////////////////////////////////////////
     /*serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
@@ -134,7 +125,6 @@ void readGPS() {
        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
    }
     */
-    /*
     int uart0_filestream = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
     struct termios options;
     tcgetattr(uart0_filestream, &options);
@@ -146,28 +136,30 @@ void readGPS() {
     tcsetattr(uart0_filestream, TCSANOW, &options);
 
     char read_buf [256];
-    char c;
-    char *b = read_buf;
+
     while(1) {
-        //int n = read(serialPort, &read_buf, sizeof(read_buf));
-        int n = read(uart0_filestream, (void*) (&c), 1);
-        if (n < 0) {
-            sleep(1);
-        }
-        else {
-            if (c == '\n') {
-                *b++ = '\0';
-                printf("%s\n", read_buf);
-                fflush(stdout);
-                break;
+        while(1) {
+            //int n = read(serialPort, &read_buf, sizeof(read_buf));
+            char c;
+            char *b = read_buf;
+            int n = read(uart0_filestream, (void *) (&c), 1);
+            if (n < 0) {
+                sleep(1);
+            } else {
+                if (c == '\n') {
+                    *b++ = '\0';
+                    break;
+                }
+                *b++ = c;
             }
-            *b++ = c;
-        }*/
-        /*
-        if(strstr(read_buf, "GGA") != NULL) {
-            //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
-            printf("%s\n", read_buf);
-        }*/
+            /*
+            if(strstr(read_buf, "GGA") != NULL) {
+                //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
+                printf("%s\n", read_buf);
+            }*/
+        }
+        printf("%s\n", read_buf);
+        fflush(stdout);
     }
 
     ////////////////////////////////////////////////////
