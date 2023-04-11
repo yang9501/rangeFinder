@@ -138,13 +138,13 @@ void readGPS() {
     char read_buf [256];
 
     while(1) {
+        char c;
+        char *b = read_buf;
         while(1) {
             //int n = read(serialPort, &read_buf, sizeof(read_buf));
-            char c;
-            char *b = read_buf;
             int n = read(uart0_filestream, (void *) (&c), 1);
             if (n < 0) {
-                sleep(1);
+                printf("Error %i from open: %s\n", errno, strerror(errno));
             } else {
                 if (c == '\n') {
                     *b++ = '\0';
