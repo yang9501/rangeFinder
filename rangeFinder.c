@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/types.h>
-#include "libgps-master/gps.h"
+#include "./libgps-master/gps.h"
 
 //comment out to live run
 //#define DEBUG 1
