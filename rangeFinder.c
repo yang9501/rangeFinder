@@ -102,7 +102,7 @@ int main(void) {
 }
 
 void readGPS() {
-    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
+    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
@@ -119,7 +119,6 @@ void readGPS() {
         char *b = read_buf;
         while(1) {
             int n = read(serialPort, (void *) (&c), 1);
-            usleep(100000);
             if (n < 0) {
 
             } else {
