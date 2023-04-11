@@ -130,7 +130,7 @@ void readGPS() {
 
         if (n < 0) {
             printf("Error reading: %s\n", strerror(errno));
-            return 1;
+            return;
         }
 
         printf("Read %i bytes. Received message: %s\n", n, read_buf);
