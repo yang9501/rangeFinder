@@ -137,7 +137,7 @@ void readGPS() {
 
     char read_buf [256];
     char c;
-    char *b = read_buf
+    char *b = read_buf;
     usleep(100000);
     while(1) {
         //int n = read(serialPort, &read_buf, sizeof(read_buf));
