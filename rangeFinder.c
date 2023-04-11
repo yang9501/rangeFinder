@@ -102,38 +102,15 @@ int main(void) {
 }
 
 void readGPS() {
-    //Begin GPS UART Read code
-    /////////////////////////////////////////////////////////
-    /*serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
-
-   // Check for errors
-   if (serialPort < 0) {
-       printf("Error %i from open: %s\n", errno, strerror(errno));
-   }
-
-   struct termios options;
-
-   tcgetattr(serialPort, &options);
-   options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-   options.c_iflag = IGNPAR;
-   options.c_oflag = 0;
-   options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-   tcflush(serialPort, TCIFLUSH);
-   tcsetattr(serialPort, TCSANOW, &options);
-
-   if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
-       printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
-   }
-    */
-    int uart0_filestream = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
+    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
     struct termios options;
-    tcgetattr(uart0_filestream, &options);
+    tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
     options.c_lflag = 0;
-    tcflush(uart0_filestream, TCIFLUSH);
-    tcsetattr(uart0_filestream, TCSANOW, &options);
+    tcflush(serialPort, TCIFLUSH);
+    tcsetattr(serialPort, TCSANOW, &options);
 
     char read_buf [256];
 
@@ -141,10 +118,9 @@ void readGPS() {
         char c;
         char *b = read_buf;
         while(1) {
-            //int n = read(serialPort, &read_buf, sizeof(read_buf));
-            int n = read(uart0_filestream, (void *) (&c), 1);
+            int n = read(serialPort, (void *) (&c), 1);
             if (n < 0) {
-                
+
             } else {
                 if (c == '\n') {
                     *b++ = '\0';
@@ -152,18 +128,10 @@ void readGPS() {
                 }
                 *b++ = c;
             }
-            /*
-            if(strstr(read_buf, "GGA") != NULL) {
-                //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
-                printf("%s\n", read_buf);
-            }*/
         }
         printf("%s\n", read_buf);
         fflush(stdout);
     }
-
-    ////////////////////////////////////////////////////
-    //End GPS UART Read code
 }
 
 
