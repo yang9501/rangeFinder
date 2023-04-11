@@ -125,7 +125,7 @@ void readGPS() {
        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
    }
     */
-    int uart0_filestream = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    int uart0_filestream = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
     struct termios options;
     tcgetattr(uart0_filestream, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
@@ -138,7 +138,6 @@ void readGPS() {
     char read_buf [256];
     char c;
     char *b = read_buf;
-    usleep(100000);
     while(1) {
         //int n = read(serialPort, &read_buf, sizeof(read_buf));
         int n = read(serialPort, (void*) (&c), 1);
