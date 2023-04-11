@@ -144,7 +144,7 @@ void readGPS() {
         int n = read(serialPort, (void*) (&c), 1);
         if (n <= 0) {
             printf("hello");
-            fflush(stdout)
+            fflush(stdout);
             sleep(1);
         }
         else {
