@@ -104,40 +104,58 @@ int main(void) {
 void readGPS() {
     //Begin GPS UART Read code
     /////////////////////////////////////////////////////////
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    /*serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
 
-    // Check for errors
-    if (serialPort < 0) {
-        printf("Error %i from open: %s\n", errno, strerror(errno));
-    }
+   // Check for errors
+   if (serialPort < 0) {
+       printf("Error %i from open: %s\n", errno, strerror(errno));
+   }
 
+   struct termios options;
+
+   tcgetattr(serialPort, &options);
+   options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+   options.c_iflag = IGNPAR;
+   options.c_oflag = 0;
+   options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+   tcflush(serialPort, TCIFLUSH);
+   tcsetattr(serialPort, TCSANOW, &options);
+
+   if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
+       printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+   }
+    */
+    int uart0_filestream = open(PORTNAME, O_RDWR | O_NOCTTY | O_NDELAY);
     struct termios options;
-    tcgetattr(serialPort, &options);
+    tcgetattr(uart0_filestream, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
-    options.c_lflag |= ICANON;
-    options.c_lflag &= ~(ECHO | ECHOE);
-    //options.c_lflag &= ICANON | IEXTEN | ISIG;
-    tcflush(serialPort, TCIFLUSH);
-    tcsetattr(serialPort, TCSANOW, &options);
+    options.c_lflag = 0;
+    tcflush(uart0_filestream, TCIFLUSH);
+    tcsetattr(uart0_filestream, TCSANOW, &options);
 
-    if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
-        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
-    }
-    char read_buf [82];
+    char read_buf [256];
+    char c;
     usleep(100000);
     while(1) {
-        int n = read(serialPort, &read_buf, sizeof(read_buf));
-
-        if (n < 0) {
-            printf("Error reading: %s\n", strerror(errno));
-            return;
+        //int n = read(serialPort, &read_buf, sizeof(read_buf));
+        int n = read(serialPort, (void*) (&c), 1);
+        if (n <= 0) {
+            sleep(1);
         }
+        else {
+            if (c == '\n') {
+                *read_buf++ = '\0';
+                break;
+            }
+            *read_buf++ = c;
+        }
+        /*
         if(strstr(read_buf, "GGA") != NULL) {
             //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
             printf("%s\n", read_buf);
-        }
+        }*/
     }
     ////////////////////////////////////////////////////
     //End GPS UART Read code
