@@ -142,13 +142,14 @@ void readGPS() {
         //int n = read(serialPort, &read_buf, sizeof(read_buf));
         int n = read(uart0_filestream, (void*) (&c), 1);
         if (n < 0) {
-            printf("hello");
-            fflush(stdout);
             sleep(1);
         }
         else {
             if (c == '\n') {
                 *b++ = '\0';
+                printf("SUP");
+                printf("%s\n", read_buf);
+                fflush(stdout);
                 break;
             }
             *b++ = c;
@@ -159,6 +160,7 @@ void readGPS() {
             printf("%s\n", read_buf);
         }*/
     }
+
     ////////////////////////////////////////////////////
     //End GPS UART Read code
 }
