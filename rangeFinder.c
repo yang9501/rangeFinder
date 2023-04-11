@@ -123,7 +123,7 @@ void readGPS() {
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
-    char read_buf [512];
+    char read_buf [256];
     usleep(100000);
     while(1) {
         int n = read(serialPort, &read_buf, sizeof(read_buf));
