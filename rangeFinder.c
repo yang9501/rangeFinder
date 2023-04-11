@@ -27,6 +27,8 @@ static uint32_t readGPIO(char *filename, char *port);
 //Primary button press detection
 void getButtonPress(void *buttonPort);
 
+void readGPS();
+
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
 
@@ -58,37 +60,6 @@ int main(void) {
     (void) writeGPIO("/direction", buttonPort, "in");
     #endif
 
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
-
-    // Check for errors
-    if (serialPort < 0) {
-        printf("Error %i from open: %s\n", errno, strerror(errno));
-    }
-
-    struct termios options;
-    tcgetattr(serialPort, &options);
-    options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-    options.c_iflag = IGNPAR;
-    options.c_oflag = 0;
-    options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-    tcflush(serialPort, TCIFLUSH);
-    tcsetattr(serialPort, TCSANOW, &options);
-
-    if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
-        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
-    }
-    char read_buf [256];
-    usleep(100000);
-    while(1) {
-        int n = read(serialPort, &read_buf, sizeof(read_buf));
-
-        if (n < 0) {
-            printf("Error reading: %s", strerror(errno));
-            return 1;
-        }
-
-        printf("Read %i bytes. Received message: %s", n, read_buf);
-    }
     //Initialize mutexes
     (void) pthread_mutex_init(&runningStateMutex, NULL);
     (void) pthread_mutex_init(&timerMutex, NULL);
@@ -122,7 +93,7 @@ int main(void) {
     pthread_attr_setschedparam(&tattr4, &param4);
 
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
-    //(void) pthread_create( &thread3, &tattr3, (void *) updateTimerThread, NULL);
+    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //(void) pthread_create( &thread4, &tattr4, (void *) displayTimerThread, NULL);
 
     (void) pthread_join(thread1, NULL);
@@ -130,6 +101,43 @@ int main(void) {
 	return 0;
 }
 
+void readGPS() {
+    //Begin GPS UART Read code
+    /////////////////////////////////////////////////////////
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+
+    // Check for errors
+    if (serialPort < 0) {
+        printf("Error %i from open: %s\n", errno, strerror(errno));
+    }
+
+    struct termios options;
+    tcgetattr(serialPort, &options);
+    options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    options.c_iflag = IGNPAR;
+    options.c_oflag = 0;
+    options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+    tcflush(serialPort, TCIFLUSH);
+    tcsetattr(serialPort, TCSANOW, &options);
+
+    if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
+        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+    }
+    char read_buf [256];
+    usleep(100000);
+    while(1) {
+        int n = read(serialPort, &read_buf, sizeof(read_buf));
+
+        if (n < 0) {
+            printf("Error reading: %s\n", strerror(errno));
+            return 1;
+        }
+
+        printf("Read %i bytes. Received message: %s\n", n, read_buf);
+    }
+    ////////////////////////////////////////////////////
+    //End GPS UART Read code
+}
 
 
 void getButtonPress(void *buttonPort) {
