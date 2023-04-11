@@ -132,8 +132,9 @@ void readGPS() {
             printf("Error reading: %s\n", strerror(errno));
             return;
         }
-
-        printf("%s\n", read_buf);
+        if(strstr(read_buf, "GGA") != NULL) {
+            printf("%s\n", read_buf);
+        }
     }
     ////////////////////////////////////////////////////
     //End GPS UART Read code
