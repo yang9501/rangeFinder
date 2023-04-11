@@ -131,7 +131,7 @@ void readGPS() {
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
-    options.c_lflag = ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+    options.c_lflag = 0;
     tcflush(uart0_filestream, TCIFLUSH);
     tcsetattr(uart0_filestream, TCSANOW, &options);
 
@@ -143,6 +143,8 @@ void readGPS() {
         //int n = read(serialPort, &read_buf, sizeof(read_buf));
         int n = read(serialPort, (void*) (&c), 1);
         if (n <= 0) {
+            printf("hello");
+            fflush(stdout)
             sleep(1);
         }
         else {
