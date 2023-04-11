@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/types.h>
+#include "libgps-master/gps.h"
 
 //comment out to live run
 //#define DEBUG 1
@@ -102,6 +103,14 @@ int main(void) {
 }
 
 void readGPS() {
+    gps_init();
+    loc_t data;
+
+    while (1) {
+        gps_location(&data);
+
+        printf("%lf %lf\n", data.latitude, data.longitude);
+    }
     //Begin GPS UART Read code
     /////////////////////////////////////////////////////////
     /*serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
@@ -125,6 +134,7 @@ void readGPS() {
        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
    }
     */
+    /*
     int uart0_filestream = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY);
     struct termios options;
     tcgetattr(uart0_filestream, &options);
@@ -147,13 +157,12 @@ void readGPS() {
         else {
             if (c == '\n') {
                 *b++ = '\0';
-                printf("SUP");
                 printf("%s\n", read_buf);
                 fflush(stdout);
                 break;
             }
             *b++ = c;
-        }
+        }*/
         /*
         if(strstr(read_buf, "GGA") != NULL) {
             //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
