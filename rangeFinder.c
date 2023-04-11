@@ -119,6 +119,7 @@ void readGPS() {
         char *b = read_buf;
         while(1) {
             int n = read(serialPort, (void *) (&c), 1);
+            usleep(1000);
             if (n < 0) {
 
             } else {
