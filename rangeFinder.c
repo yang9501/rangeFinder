@@ -123,7 +123,7 @@ void readGPS() {
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
-    char read_buf [256];
+    char read_buf [512];
     usleep(100000);
     while(1) {
         int n = read(serialPort, &read_buf, sizeof(read_buf));
@@ -133,7 +133,7 @@ void readGPS() {
             return;
         }
 
-        printf("%s\n", n, read_buf);
+        printf("%s\n", read_buf);
     }
     ////////////////////////////////////////////////////
     //End GPS UART Read code
