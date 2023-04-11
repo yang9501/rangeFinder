@@ -123,7 +123,7 @@ void readGPS() {
     if (tcsetattr(serialPort, TCSANOW, &options) != 0) {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
-    char read_buf [512];
+    char read_buf [82];
     usleep(100000);
     while(1) {
         int n = read(serialPort, &read_buf, sizeof(read_buf));
@@ -133,6 +133,7 @@ void readGPS() {
             return;
         }
         if(strstr(read_buf, "GGA") != NULL) {
+            //https://www.youtube.com/watch?v=zn7m2Mdm_Vg
             printf("%s\n", read_buf);
         }
     }
