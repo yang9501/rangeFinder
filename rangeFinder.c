@@ -181,7 +181,7 @@ void rangeFinder() {
             if (n < 0) {
                 printf("Unresponsive\n");
             } else {
-                printf("%n\n",n);
+                printf("N : %d\n",n);
                 printf("Output: %s\n", read_buf);
                 fflush(stdout);
             }
