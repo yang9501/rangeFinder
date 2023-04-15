@@ -129,6 +129,7 @@ void readGPS() {
 
 void rangeFinder() {
     unsigned char cmd1[] = { 0x80, 0x06, 0x03, 0x77 };         // Continious Measurement Mode
+    unsigned char cmd2[] = { 0x80, 0x06, 0x07, 0x73 };
     unsigned char cmd3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
     unsigned char cmd4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
 
@@ -174,14 +175,12 @@ void rangeFinder() {
     char read_buf [256];
     printf("Beginning read\n");
     while(1) {
-        char c[12];
-        char *b = read_buf;
         while(1) {
-            int n = read(serialPort, (void *) (&b), 12);
+            //int n = read(serialPort, (void *) (&read_buf), 12);
+
             if (n < 0) {
                 printf("Unresponsive\n");
             } else {
-                printf("N : %d\n",n);
                 printf("Output: %s\n", read_buf);
                 fflush(stdout);
             }
