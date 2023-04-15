@@ -149,7 +149,7 @@ void rangeFinder() {
 
     ////////////SETUP
     int continuousMeasurementMode = 1;
-    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    int serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
