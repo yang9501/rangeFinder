@@ -36,9 +36,6 @@ float timerInMilliseconds;
 pthread_mutex_t runningStateMutex;
 int watchRunningState;
 
-struct termios tty;
-int serialPort = -1;
-
 int main(void) {
     //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
@@ -87,8 +84,8 @@ int main(void) {
     pthread_attr_setschedparam(&tattr4, &param4);
 
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
-    //(void) pthread_create( &thread4, &tattr4, (void *) displayTimerThread, NULL);
+    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
     (void) pthread_join(thread1, NULL);
 
@@ -96,11 +93,11 @@ int main(void) {
 }
 
 void readGPS() {
-    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-    options.c_iflag = IGNPAR;
+    options.c_iflag = IGNPAR | ICRNL | IGNCR;
     options.c_oflag = 0;
     options.c_lflag = 0;
     tcflush(serialPort, TCIFLUSH);
@@ -131,21 +128,66 @@ void readGPS() {
 }
 
 void rangeFinder() {
-    unsigned char cmd_2[] = { 0x80, 0x06, 0x02, 0x78 };         // Single Measurement Mode
-    unsigned char cmd_3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
-    unsigned char cmd_4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
+    unsigned char cmd1[] = { 0x80, 0x06, 0x03, 0x77 };         // Continious Measurement Mode
+    unsigned char cmd3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
+    unsigned char cmd4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
 
-    unsigned char cmd_5[] = { 0xFA, 0x04, 0x09, 0x05, 0xF4 };   // 5m Range
-    unsigned char cmd_6[] = { 0xFA, 0x04, 0x09, 0x0A, 0xEF };   // 10m Range
-    unsigned char cmd_7[] = { 0xFA, 0x04, 0x09, 0x1E, 0xDB };   // 30m Range
-    unsigned char cmd_8[] = { 0xFA, 0x04, 0x09, 0x32, 0xC7 };   // 50m Range
-    unsigned char cmd_9[] = { 0xFA, 0x04, 0x09, 0x50, 0xA9 };   // 80m Range
+    unsigned char cmd5[] = { 0xFA, 0x04, 0x0A, 0x00, 0xF8 };   // 2Hz
+    unsigned char cmd6[] = { 0xFA, 0x04, 0x0A, 0x05, 0xF3 };   // 5Hz
+    unsigned char cmd7[] = { 0xFA, 0x04, 0x0A, 0x0A, 0xEE };   // 10Hz
+    unsigned char cmd8[] = { 0xFA, 0x04, 0x0A, 0x14, 0xE4 };   // 20Hz
 
-    unsigned char cmd_10[] = { 0xFA, 0x04, 0x0C, 0x02, 0xF4 };   // 0.1mm Resolution
-    unsigned char cmd_11[] = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };   // 1mm Resolution
+    unsigned char cmd9[] = { 0xFA, 0x04, 0x09, 0x05, 0xF4 };    // 5m Range
+    unsigned char cmd10[] = { 0xFA, 0x04, 0x09, 0x0A, 0xEF };   // 10m Range
+    unsigned char cmd11[] = { 0xFA, 0x04, 0x09, 0x1E, 0xDB };   // 30m Range
+    unsigned char cmd12[] = { 0xFA, 0x04, 0x09, 0x32, 0xC7 };   // 50m Range
+    unsigned char cmd13[] = { 0xFA, 0x04, 0x09, 0x50, 0xA9 };   // 80m Range
+
+    unsigned char cmd14[] = { 0xFA, 0x04, 0x0C, 0x02, 0xF4 };   // 0.1mm Resolution
+    unsigned char cmd15[] = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };   // 1mm Resolution
+
 
     ////////////SETUP
+    int continuousMeasurementMode = 1;
+    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    struct termios options;
+    tcgetattr(serialPort, &options);
+    options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    options.c_iflag = IGNPAR | ICRNL | IGNCR;
+    options.c_oflag = 0;
+    options.c_lflag = 0;
+    tcflush(serialPort, TCIFLUSH);
+    tcsetattr(serialPort, TCSANOW, &options);
 
+    write(serialPort, cmd1, sizeof(cmd1));  //Turn continuous measurement on
+    sleep(1);
+    write(serialPort, cmd7, sizeof(cmd7));  //Set measurement frequency to 10Hz
+    sleep(1);
+    write(serialPort, cmd10, sizeof(cmd10));  //Set range to 10m
+    sleep(1);
+
+    char read_buf [256];
+
+    while(1) {
+        char c;
+        char *b = read_buf;
+        while(1) {
+            int n = read(serialPort, (void *) (&c), 1);
+            if (n < 0) {
+
+            } else {
+                if (c == '\n') {
+                    *b++ = '\0';
+                    break;
+                }
+                *b++ = c;
+            }
+        }
+        /////////////TODO: MUTEX AND INFODUMP HERE
+        printf("%s\n", read_buf);
+        fflush(stdout);
+        /////////////////////////////////////
+    }
 }
 
 void getButtonPress(void *buttonPort) {
