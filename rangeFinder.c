@@ -183,6 +183,7 @@ void rangeFinder() {
     sleep(1);
 
     char read_buf [256];
+    char test_buf [256];
     printf("Beginning read\n");
     while(1) {
         while(1) {
@@ -191,7 +192,9 @@ void rangeFinder() {
             if (n < 0) {
                 printf("Unresponsive\n");
             } else {
-                printf("Output: %s\n", read_buf);
+                printf("Raw data: %s\n", read_buf);
+                strncpy(test_buf, read_buf + 2, 7);
+                printf("Parsed: %s\n", test_buf);
                 fflush(stdout);
             }
         }
