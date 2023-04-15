@@ -158,17 +158,21 @@ void rangeFinder() {
     options.c_lflag = 0;
     tcflush(serialPort, TCIFLUSH);
     tcsetattr(serialPort, TCSANOW, &options);
-
+    printf("Beginning startup commands\n");
+    printf("Continuous Measurement On\n");
     write(serialPort, cmd1, sizeof(cmd1));  //Turn continuous measurement on
     sleep(1);
+    printf("Measurement Frequency\n");
     write(serialPort, cmd7, sizeof(cmd7));  //Set measurement frequency to 10Hz
     sleep(1);
+    printf("Set Range\n");
     write(serialPort, cmd10, sizeof(cmd10));  //Set range to 10m
     sleep(1);
+    printf("Rangefinder on\n");
     write(serialPort, cmd3, sizeof(cmd3));  //Turn rangefinder on
     sleep(1);
     char read_buf [256];
-
+    printf("Beginning read\n");
     while(1) {
         char c[12];
         char *b = read_buf;
