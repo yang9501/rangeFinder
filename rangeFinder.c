@@ -164,23 +164,23 @@ void rangeFinder() {
 
     printf("Resolution to 1mm\n");
     write(serialPort, cmd15, sizeof(cmd15));  //Set resolution to 1mm
-    sleep(1);
+    //sleep(1);
 
     printf("Measurement Frequency\n");
     write(serialPort, cmd7, sizeof(cmd7));  //Set measurement frequency to 10Hz
-    sleep(1);
+    //sleep(1);
 
     printf("Set Range\n");
     write(serialPort, cmd10, sizeof(cmd10));  //Set range to 10m
-    sleep(1);
+    //sleep(1);
 
     printf("Laser on\n");
     write(serialPort, cmd3, sizeof(cmd3));  //Turn visible laser on
-    sleep(1);
+    //sleep(1);
 
     printf("Continuous Measurement On\n");
     write(serialPort, cmd1, sizeof(cmd1));  //Turn continuous measurement on
-    sleep(1);
+    //sleep(1);
 
     char read_buf [256];
     printf("Beginning read\n");
