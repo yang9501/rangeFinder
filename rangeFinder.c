@@ -165,7 +165,8 @@ void rangeFinder() {
     sleep(1);
     write(serialPort, cmd10, sizeof(cmd10));  //Set range to 10m
     sleep(1);
-
+    write(serialPort, cmd3, sizeof(cmd3));  //Turn rangefinder on
+    sleep(1);
     char read_buf [256];
 
     while(1) {
