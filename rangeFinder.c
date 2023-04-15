@@ -171,7 +171,7 @@ void rangeFinder() {
     sleep(1);
 
     printf("Set Range\n");
-    write(serialPort, cmd10, sizeof(cmd10));  //Set range to 10m
+    write(serialPort, cmd11, sizeof(cmd11));  //Set range to 10m
     sleep(1);
 
     printf("Laser on\n");
