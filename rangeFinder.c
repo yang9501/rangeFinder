@@ -28,7 +28,7 @@ static uint32_t readGPIO(char *filename, char *port);
 void getButtonPress(void *buttonPort);
 
 void readGPS();
-void rangeFinder()
+void rangeFinder();
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
