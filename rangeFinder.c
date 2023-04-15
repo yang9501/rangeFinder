@@ -186,7 +186,7 @@ void rangeFinder() {
     printf("Beginning read\n");
     while(1) {
         while(1) {
-            int n = read(serialPort, (void *) (&read_buf), 12);
+            int n = read(serialPort, (void *) (&read_buf), 11);
 
             if (n < 0) {
                 printf("Unresponsive\n");
