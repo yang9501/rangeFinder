@@ -174,7 +174,7 @@ void rangeFinder() {
         while(1) {
             int n = read(serialPort, (void *) (&c), 1);
             if (n < 0) {
-
+                printf("Unresponsive\n");
             } else {
                 if (c == '\n') {
                     *b++ = '\0';
