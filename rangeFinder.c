@@ -169,23 +169,19 @@ void rangeFinder() {
     char read_buf [256];
 
     while(1) {
-        char c;
+        char c[12];
         char *b = read_buf;
         while(1) {
-            int n = read(serialPort, (void *) (&c), 1);
+            int n = read(serialPort, (void *) (&b), 12);
             if (n < 0) {
                 printf("Unresponsive\n");
             } else {
-                if (c == '\n') {
-                    *b++ = '\0';
-                    break;
-                }
-                *b++ = c;
+                printf("%s\n", read_buf);
+                fflush(stdout);
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        printf("%s\n", read_buf);
-        fflush(stdout);
+
         /////////////////////////////////////
     }
 }
