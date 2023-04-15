@@ -193,7 +193,7 @@ void rangeFinder() {
                 printf("Unresponsive\n");
             } else {
                 printf("Raw data: %s\n", read_buf);
-                strncpy(test_buf, read_buf + 2, 7);
+                strncpy(test_buf, read_buf + 3, 7);
                 printf("Parsed: %s\n", test_buf);
                 fflush(stdout);
             }
