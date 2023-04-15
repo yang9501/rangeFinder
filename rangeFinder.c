@@ -28,19 +28,13 @@ static uint32_t readGPIO(char *filename, char *port);
 void getButtonPress(void *buttonPort);
 
 void readGPS();
+void rangeFinder()
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
 
 pthread_mutex_t runningStateMutex;
 int watchRunningState;
-
-char uartReadBuffer0[64];
-char uartReadBuffer1[64];
-char uartReadBuffer2[64];
-char uartReadBuffer3[64];
-char uartReadBuffer4[64];
-
 
 struct termios tty;
 int serialPort = -1;
@@ -102,7 +96,7 @@ int main(void) {
 }
 
 void readGPS() {
-    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+    serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
@@ -129,11 +123,30 @@ void readGPS() {
                 *b++ = c;
             }
         }
+        /////////////TODO: MUTEX AND INFODUMP HERE
         printf("%s\n", read_buf);
         fflush(stdout);
+        /////////////////////////////////////
     }
 }
 
+void rangeFinder() {
+    byte cmd_2[] = { 0x80, 0x06, 0x02, 0x78 };         // Single Measurement Mode
+    byte cmd_3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
+    byte cmd_4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
+
+    byte cmd_5[] = { 0xFA, 0x04, 0x09, 0x05, 0xF4 };   // 5m Range
+    byte cmd_6[] = { 0xFA, 0x04, 0x09, 0x0A, 0xEF };   // 10m Range
+    byte cmd_7[] = { 0xFA, 0x04, 0x09, 0x1E, 0xDB };   // 30m Range
+    byte cmd_8[] = { 0xFA, 0x04, 0x09, 0x32, 0xC7 };   // 50m Range
+    byte cmd_9[] = { 0xFA, 0x04, 0x09, 0x50, 0xA9 };   // 80m Range
+
+    byte cmd_10[] = { 0xFA, 0x04, 0x0C, 0x02, 0xF4 };   // 0.1mm Resolution
+    byte cmd_11[] = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };   // 1mm Resolution
+
+    ////////////SETUP
+
+}
 
 void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
