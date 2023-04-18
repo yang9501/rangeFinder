@@ -88,9 +88,9 @@ int main(void) {
     pthread_attr_setschedparam(&tattr4, &param4);
 
     //Button Thread
-    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
+    //(void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
-    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
