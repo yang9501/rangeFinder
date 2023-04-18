@@ -96,7 +96,7 @@ int main(void) {
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
-    (void) pthread_join(thread1, NULL);
+    (void) pthread_join(thread2, NULL);
 
 	return 0;
 }
