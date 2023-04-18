@@ -128,7 +128,7 @@ void readGPS() {
 }
 
 void rangeFinder() {
-    unsigned char cmd1[] = { 0x80, 0x06, 0x03, 0x77 };         // Continious Measurement Mode
+    unsigned char cmd1[] = { 0x80, 0x06, 0x03, 0x77 };         // Continuous Measurement Mode
     unsigned char cmd2[] = { 0x80, 0x06, 0x07, 0x73 };
     unsigned char cmd3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
     unsigned char cmd4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
@@ -160,7 +160,6 @@ void rangeFinder() {
     tcflush(serialPort, TCIFLUSH);
     tcsetattr(serialPort, TCSANOW, &options);
     printf("Beginning startup commands\n");
-
 
     printf("Resolution to 1mm\n");
     write(serialPort, cmd15, sizeof(cmd15));  //Set resolution to 1mm
@@ -194,13 +193,12 @@ void rangeFinder() {
             } else {
                 printf("Raw data: %s\n", read_buf);
                 strncpy(test_buf, read_buf + 3, 7);
+                /////////////TODO: MUTEX AND INFODUMP HERE
                 printf("Parsed: %s\n", test_buf);
                 fflush(stdout);
+                //////////////////////////////////
             }
         }
-        /////////////TODO: MUTEX AND INFODUMP HERE
-
-        /////////////////////////////////////
     }
 }
 
