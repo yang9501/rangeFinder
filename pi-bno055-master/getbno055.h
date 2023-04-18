@@ -168,7 +168,7 @@
 /* ------------------------------------------------------------ *
  * global variables                                             *
  * ------------------------------------------------------------ */
-extern int verbose = 0;     // debug flag, 0 = normal, 1 = debug mode
+int verbose = 0;     // debug flag, 0 = normal, 1 = debug mode
 
 /* ------------------------------------------------------------ *
  * BNO055 versions, status data and other infos struct          *
