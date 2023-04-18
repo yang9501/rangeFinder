@@ -186,6 +186,8 @@ void bno055() {
 
     get_i2cbus(i2c_bus, senaddr);
     print_calstat();
+    struct bnoinf bnoi;
+    res = get_inf(&bnoi);
 }
 
 
