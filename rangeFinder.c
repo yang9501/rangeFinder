@@ -109,12 +109,14 @@ void printDisplay() {
         printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
         exit(1);
     }
-
+    printf("Hello\n");
     display_Init_seq();
+    printf("Hi\n");
 
     /* Clear display */
     clearDisplay();
 
+    printf("Hasdf\n");
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
