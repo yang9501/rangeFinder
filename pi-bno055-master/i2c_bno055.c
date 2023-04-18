@@ -22,7 +22,7 @@
  * global variables                                             *
  * ------------------------------------------------------------ */
 int i2cfd;       // I2C file descriptor
-
+int verbose = 0;
 /* ------------------------------------------------------------ *
  * get_i2cbus() - Enables the I2C bus communication. Raspberry  *
  * Pi 2 uses i2c-1, RPI 1 used i2c-0, NanoPi also uses i2c-0.   *
