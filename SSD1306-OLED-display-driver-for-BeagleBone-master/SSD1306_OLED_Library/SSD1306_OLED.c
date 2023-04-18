@@ -35,7 +35,7 @@ SOFTWARE.
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-#include "I2C.h"
+#include "../I2C_Library/I2C.h"
 #include "SSD1306_OLED.h"
 #include "gfxfont.h"
 

@@ -12,7 +12,8 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/types.h>
-
+#include "SSD1306-OLED-display-driver-for-BeagleBone-master/SSD1306_OLED_Library/SSD1306_OLED.h"
+#include "SSD1306-OLED-display-driver-for-BeagleBone-master/I2C_Library/I2C.h"
 //comment out to live run
 //#define DEBUG 1
 
@@ -83,9 +84,14 @@ int main(void) {
     pthread_attr_setschedparam(&tattr3, &param3);
     pthread_attr_setschedparam(&tattr4, &param4);
 
-    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
+    //Button Thread
+    //(void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
+    //Thread
+    //(void) pthread_create( &thread2, &tattr2, (void *) readGPS, NULL);
+    //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
-    (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
+    //Rangefinder Thread
+    //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
     (void) pthread_join(thread1, NULL);
 
