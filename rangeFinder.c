@@ -110,9 +110,6 @@ void printDisplay() {
         exit(1);
     }
 
-    /* Register the Alarm Handler */
-    signal(SIGALRM, ALARMhandler);
-
     display_Init_seq();
 
     /* Clear display */
