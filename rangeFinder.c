@@ -110,7 +110,7 @@ void printDisplay() {
         exit(1);
     }
     printf("Hello\n");
-    //display_Init_seq();
+    display_Init_seq();
     printf("Hi\n");
 
     /* Clear display */
