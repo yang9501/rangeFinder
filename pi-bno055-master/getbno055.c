@@ -25,7 +25,7 @@
 /* ------------------------------------------------------------ *
  * Global variables and defaults                                *
  * ------------------------------------------------------------ */
-verbose = 0;
+int verbose = 0;
 int outflag = 0;
 int argflag = 0; // 1 dump, 2 reset, 3 load calib, 4 write calib
 char opr_mode[9] = {0};
