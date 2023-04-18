@@ -28,6 +28,8 @@ static uint32_t readGPIO(char *filename, char *port);
 
 //Primary button press detection
 void getButtonPress(void *buttonPort);
+void print_calstat();
+void bno055();
 void printDisplay();
 void readGPS();
 void rangeFinder();
@@ -88,7 +90,7 @@ int main(void) {
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
-    //(void) pthread_create( &thread2, &tattr2, (void *) readGPS, NULL);
+    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
@@ -98,6 +100,95 @@ int main(void) {
 
 	return 0;
 }
+
+void print_calstat() {
+    struct bnocal bnoc;
+    /* -------------------------------------------------------- *
+     *  Check the sensors calibration state                     *
+     * -------------------------------------------------------- */
+    int res = get_calstatus(&bnoc);
+    if(res != 0) {
+        printf("Error: Cannot read calibration state.\n");
+        exit(-1);
+    }
+
+    /* -------------------------------------------------------- *
+     *  Convert the status code into a status message           *
+     * -------------------------------------------------------- */
+    printf("Sensor System Calibration = ");
+    switch(bnoc.scal_st) {
+        case 0:
+            printf("Uncalibrated\n");
+            break;
+        case 1:
+            printf("Minimal Calibrated\n");
+            break;
+        case 2:
+            printf("Mostly Calibrated\n");
+            break;
+        case 3:
+            printf("Fully calibrated\n");
+            break;
+    }
+
+    printf("    Gyroscope Calibration = ");
+    switch(bnoc.gcal_st) {
+        case 0:
+            printf("Uncalibrated\n");
+            break;
+        case 1:
+            printf("Minimal Calibrated\n");
+            break;
+        case 2:
+            printf("Mostly Calibrated\n");
+            break;
+        case 3:
+            printf("Fully calibrated\n");
+            break;
+    }
+
+    printf("Accelerometer Calibration = ");
+    switch(bnoc.acal_st) {
+        case 0:
+            printf("Uncalibrated\n");
+            break;
+        case 1:
+            printf("Minimal Calibrated\n");
+            break;
+        case 2:
+            printf("Mostly Calibrated\n");
+            break;
+        case 3:
+            printf("Fully calibrated\n");
+            break;
+    }
+
+    printf(" Magnetometer Calibration = ");
+    switch(bnoc.mcal_st) {
+        case 0:
+            printf("Uncalibrated\n");
+            break;
+        case 1:
+            printf("Minimal Calibrated\n");
+            break;
+        case 2:
+            printf("Mostly Calibrated\n");
+            break;
+        case 3:
+            printf("Fully calibrated\n");
+            break;
+    }
+}
+
+void bno055() {
+    char senaddr[256] = "0x28";
+    char i2c_bus[256] = I2CBUS;
+
+    get_i2cbus(i2c_bus, senaddr);
+    print_calstat();
+}
+
+
 
 void printDisplay() {
     /* Initialize I2C bus and connect to the I2C Device */
@@ -110,14 +201,12 @@ void printDisplay() {
         printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
         exit(1);
     }
-    printf("Hello\n");
+
     display_Init_seq();
-    printf("Hi\n");
 
     /* Clear display */
     clearDisplay();
 
-    printf("Hasdf\n");
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
