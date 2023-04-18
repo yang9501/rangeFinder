@@ -39,7 +39,7 @@ SOFTWARE.
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 /* I2C Address of SSD1306 */
-#define SSD1306_OLED_ADDR                                          0x3C
+#define SSD1306_OLED_ADDR                                          0x3D
 #define DISPLAY_BUFF_SIZE                                          (SSD1306_LCDWIDTH*SSD1306_LCDHEIGHT/8)
 
 /* COLOR MACROS */
