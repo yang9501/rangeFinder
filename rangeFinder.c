@@ -191,7 +191,7 @@ void bno055() {
     /* ----------------------------------------------------------- *
        * print the formatted output strings to stdout                *
        * ----------------------------------------------------------- */
-    printf("\nBN0055 Information",);
+    printf("\nBN0055 Information");
     printf("----------------------------------------------\n");
     printf("   Chip Version ID = 0x%02X\n", bnoi.chip_id);
     printf("  Accelerometer ID = 0x%02X\n", bnoi.acc_id);
