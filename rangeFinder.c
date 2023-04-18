@@ -27,7 +27,7 @@ static uint32_t readGPIO(char *filename, char *port);
 
 //Primary button press detection
 void getButtonPress(void *buttonPort);
-
+void printDisplay();
 void readGPS();
 void rangeFinder();
 
@@ -85,7 +85,7 @@ int main(void) {
     pthread_attr_setschedparam(&tattr4, &param4);
 
     //Button Thread
-    //(void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
+    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
     //(void) pthread_create( &thread2, &tattr2, (void *) readGPS, NULL);
     //GPS Thread
@@ -96,6 +96,39 @@ int main(void) {
     (void) pthread_join(thread1, NULL);
 
 	return 0;
+}
+
+void printDisplay() {
+    /* Initialize I2C bus and connect to the I2C Device */
+    if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
+    {
+        printf("(Main)i2c-2: Bus Connected to SSD1306\r\n");
+    }
+    else
+    {
+        printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
+        exit(1);
+    }
+
+    /* Register the Alarm Handler */
+    signal(SIGALRM, ALARMhandler);
+
+    display_Init_seq();
+
+    /* Clear display */
+    clearDisplay();
+
+    setTextSize(1);
+    setTextColor(WHITE);
+    setCursor(1,0);
+    print_strln("deeplyembedded.org");
+    println();
+    print_strln("Author:Vinay Divakar");
+    println();
+    println();
+    print_strln("THANK YOU");
+
+    Display();
 }
 
 void readGPS() {
@@ -212,6 +245,7 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
+    printDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
