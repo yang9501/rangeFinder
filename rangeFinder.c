@@ -90,13 +90,13 @@ int main(void) {
     //Button Thread
     //(void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
-    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
-    (void) pthread_join(thread3, NULL);
+    (void) pthread_join(thread2, NULL);
 
 	return 0;
 }
