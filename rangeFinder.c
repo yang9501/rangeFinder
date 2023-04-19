@@ -185,9 +185,14 @@ void bno055() {
     char i2c_bus[256] = I2CBUS;
 
     get_i2cbus(i2c_bus, senaddr);
-    print_calstat();
+    int res = set_mode(newmode);
+    if(res != 0) {
+        printf("Error: could not set sensor mode %s [0x%02X].\n", opr_mode, newmode);
+        exit(-1);
+    }
+    
     struct bnoinf bnoi;
-    int res = get_inf(&bnoi);
+    res = get_inf(&bnoi);
     /* ----------------------------------------------------------- *
        * print the formatted output strings to stdout                *
        * ----------------------------------------------------------- */
