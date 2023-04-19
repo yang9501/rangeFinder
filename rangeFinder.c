@@ -33,6 +33,8 @@ void bno055();
 void printDisplay();
 void readGPS();
 void rangeFinder();
+void getBno055Info();
+void getCalStatus();
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
@@ -180,19 +182,44 @@ void print_calstat() {
     }
 }
 
-void bno055() {
-    char senaddr[256] = "0x28";
-    char i2c_bus[256] = I2CBUS;
-
-    get_i2cbus(i2c_bus, senaddr);
-    int res = set_mode(compass);
+void getCalStatus() {
+    struct bnocal bnoc;
+    /* -------------------------------------------------------- *
+     *  Read the sensors calibration state                      *
+     * -------------------------------------------------------- */
+    int res = get_calstatus(&bnoc);
     if(res != 0) {
-        printf("Error: could not set sensor mode \n");
+        printf("Error: Cannot read calibration state.\n");
+        exit(-1);
+    }
+    /* -------------------------------------------------------- *
+     *  Read the sensors calibration offset                     *
+     * -------------------------------------------------------- */
+    res = get_caloffset(&bnoc);
+    if(res != 0) {
+        printf("Error: Cannot read calibration data.\n");
         exit(-1);
     }
 
+    /* -------------------------------------------------------- *
+     *  Print the calibration data line                         *
+     * -------------------------------------------------------- */
+    printf("sys [S:%d]", bnoc.scal_st);
+    printf(" acc [S:%d ", bnoc.acal_st);
+    printf("X:%d Y:%d Z:%d", bnoc.aoff_x, bnoc.aoff_y, bnoc.aoff_z);
+    printf(" R:%d]", bnoc.acc_rad);
+
+    printf(" mag [S:%d ", bnoc.mcal_st);
+    printf("X:%d Y:%d Z:%d", bnoc.moff_x, bnoc.moff_y, bnoc.moff_z);
+    printf(" R:%d]", bnoc.mag_rad);
+
+    printf(" gyr [S:%d ", bnoc.gcal_st);
+    printf("X:%d Y:%d Z:%d]\n", bnoc.goff_x, bnoc.goff_y, bnoc.goff_z);
+}
+
+void getBno055Info() {
     struct bnoinf bnoi;
-    res = get_inf(&bnoi);
+    int res = get_inf(&bnoi);
     /* ----------------------------------------------------------- *
        * print the formatted output strings to stdout                *
        * ----------------------------------------------------------- */
@@ -278,6 +305,20 @@ void bno055() {
 
     printf("\n----------------------------------------------\n");
     print_calstat();
+}
+
+void bno055() {
+    char senaddr[256] = "0x28";
+    char i2c_bus[256] = I2CBUS;
+
+    get_i2cbus(i2c_bus, senaddr);
+    int res = set_mode(compass);
+    if(res != 0) {
+        printf("Error: could not set sensor mode \n");
+        exit(-1);
+    }
+    getBno055Info();
+    getCalStatus();
 }
 
 
