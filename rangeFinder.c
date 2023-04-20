@@ -30,7 +30,7 @@ static uint32_t readGPIO(char *filename, char *port);
 void getButtonPress(void *buttonPort);
 void print_calstat();
 void bno055();
-void printDisplay();
+void printCalibrationDisplay();
 void readGPS();
 void rangeFinder();
 void getBno055Info();
