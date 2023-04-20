@@ -319,6 +319,8 @@ void bno055() {
     }
     getBno055Info();
     getCalStatus();
+    struct bnoeul bnod;
+    res = get_eul(&bnod);
 }
 
 
