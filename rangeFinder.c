@@ -90,15 +90,15 @@ int main(void) {
     pthread_attr_setschedparam(&tattr4, &param4);
 
     //Button Thread
-    //(void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
+    (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
     //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
-    (void) pthread_join(thread3, NULL);
+    (void) pthread_join(thread1, NULL);
 
 	return 0;
 }
@@ -361,41 +361,7 @@ void bno055() {
      */
 }
 
-
-
-void printDisplay() {
-    /* Initialize I2C bus and connect to the I2C Device */
-    if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
-    {
-        printf("(Main)i2c-2: Bus Connected to SSD1306\r\n");
-    }
-    else
-    {
-        printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
-        exit(1);
-    }
-
-    display_Init_seq();
-
-    /* Clear display */
-    clearDisplay();
-
-    setTextSize(1);
-    setTextColor(WHITE);
-    setCursor(1,0);
-    print_strln("deeplyembedded.org");
-    println();
-    print_strln("Author:Vinay Divakar");
-    println();
-    println();
-    print_strln("THANK YOU");
-
-    Display();
-}
-
 void readGPS() {
-    unsigned char cmd3[] = "$PMTK314,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28";
-
     int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
@@ -407,10 +373,6 @@ void readGPS() {
     tcsetattr(serialPort, TCSANOW, &options);
 
     char read_buf [256];
-
-    printf("Antenna messages\n");
-    write(serialPort, cmd3, sizeof(cmd3));  //Turn visible laser on
-    sleep(1);
 
     while(1) {
         char c;
@@ -507,6 +469,35 @@ void rangeFinder() {
             }
         }
     }
+}
+
+void printDisplay() {
+    /* Initialize I2C bus and connect to the I2C Device */
+    if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
+    {
+        printf("(Main)i2c-2: Bus Connected to SSD1306\r\n");
+    }
+    else
+    {
+        printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
+        exit(1);
+    }
+
+    display_Init_seq();
+
+    /* Clear display */
+    clearDisplay();
+
+    setTextSize(1);
+    setTextColor(WHITE);
+    setCursor(1,0);
+    print_strln("GPS Status: ");
+    println();
+    print_strln("Rangefinder Status: ");
+    println();
+    print_strln("Compass Status: ");
+
+    Display();
 }
 
 void getButtonPress(void *buttonPort) {
