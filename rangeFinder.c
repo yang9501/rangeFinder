@@ -528,13 +528,12 @@ void printCalibrationDisplay() {
         }
         Display();
         if(gpsReadyFlag == 1 && rangeFinderReadyFlag == 1 && compassReadyFlag == 1) {
-            printf("BREAKING\n");
-            sleep(3);
+            //printf("BREAKING\n");
+            sleep(2);
             break;
         }
         sleep(1);
     }
-    printf("HELLOKLDFJLKDSJF\n");
     clearDisplay();
 
     setTextSize(1);
@@ -548,17 +547,23 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    sleep(3);
-    gpsReadyFlag = 1;
+    printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
             //first press detected
             if(pressedFlag == 0) {
                 pressedFlag = 1;
-                //If the buttonPort corresponds with start/stop
-                printf("hellosuip\n");
-                fflush(stdout);
+                clearDisplay();
+
+                setTextSize(1);
+                setTextColor(WHITE);
+                setCursor(1, 0);
+                print_strln("Latitude: ");
+                print_strln("112.123123");
+                print_strln("Longitude: ");
+                print_strln("-38.567567");
+                Display();
             }
         }
         if(gpioValue == 0) {
