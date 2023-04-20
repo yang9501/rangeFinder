@@ -46,8 +46,12 @@ int gpsReadyFlag = 1;
 int rangeFinderReadyFlag = 1;
 int compassReadyFlag = 1;
 
-char latitude[256];
-char longitude[256];
+double latitude = 0.0;
+double longitude = 0.0;
+
+double eul_heading = 0.0;
+double eul_roll = 0.0;
+double eul_pitch = 0.0;
 
 
 
@@ -111,9 +115,9 @@ int main(void) {
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
-    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     //Display Thread
@@ -347,6 +351,9 @@ void bno055() {
 
     getBno055Info();
     getCalStatus();
+    while(1) {
+        print_calstat();
+    }
     /*
     int gyrCalReady = 0;
     while(!gyrCalReady) {
@@ -426,9 +433,8 @@ void parseGPSMessage(char* message) {
 
         printf("TESTING LAT: %f\n", degreesToDecimal(3051.8095));
         printf("TESTING LONG: %f\n", degreesToDecimal(10036.0022));
-        //newCoords(degreesToDecimal(3887.94), degreesToDecimal(-77228.294), 0, -500);
-
-        newCoords(38.8794, -77.228294, 500, -500);
+        newCoords(degreesToDecimal(3887.94), degreesToDecimal(-77228.294), 0, -500);
+        //GOOGLE MAPS TESTING newCoords(38.8794, -77.228294, 500, -500);
     }
 }
 
