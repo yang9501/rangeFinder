@@ -271,9 +271,9 @@ double degreesToDecimal(double degreeCoord) {
 void parseGPSMessage(char* message) {
     if (strstr(message, "$GNGGA") != NULL) {
         double latRawValue = 0.0;
-        char ns[1];
+        char *ns;
         double longRawValue = 0.0;
-        char ew[1];
+        char *ew;
         printf("%s\n", message);
         char *p = message;
         p = strchr(p, ',')+1; //skip time
@@ -283,7 +283,7 @@ void parseGPSMessage(char* message) {
         printf("latitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
-        strcpy(ns, p[0]);
+        ns = p[0];
         printf("latitude hemisphere: %c\n", p[0]);
 
         p = strchr(p, ',')+1;
@@ -291,7 +291,7 @@ void parseGPSMessage(char* message) {
         printf("longitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
-        strcpy(ew, p[0]);
+        ew = p[0];
         printf("longitude hemisphere: %c\n", p[0]);
 
         double latitude = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
