@@ -37,8 +37,8 @@ void getBno055Info();
 void getCalStatus();
 
 int gpsReadyFlag = 0;
-int compassReadyFlag = 1;
 int rangeFinderReadyFlag = 0;
+int compassReadyFlag = 1;
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
@@ -498,36 +498,35 @@ void printCalibrationDisplay() {
 
     display_Init_seq();
 
-    /* Clear display */
-    clearDisplay();
+    while(1) {
+        clearDisplay();
 
-    setTextSize(1);
-    setTextColor(WHITE);
-    setCursor(1,0);
-    print_strln(gpsStatus);
-    if(gpsReadyFlag == 0) {
-        print_strln(calibratingStatus);
+        setTextSize(1);
+        setTextColor(WHITE);
+        setCursor(1, 0);
+
+        print_strln(gpsStatus);
+        if (gpsReadyFlag == 0) {
+            print_strln(calibratingStatus);
+        } else {
+            print_strln(readyStatus);
+        }
+        println();
+        print_strln(rangeFinderStatus);
+        if (rangeFinderReadyFlag == 0) {
+            print_strln(calibratingStatus);
+        } else {
+            print_strln(readyStatus);
+        }
+        println();
+        print_strln(compassStatus);
+        if (compassReadyFlag == 0) {
+            print_strln(calibratingStatus);
+        } else {
+            print_strln(readyStatus);
+        }
+        Display();
     }
-    else {
-        print_strln(readyStatus);
-    }
-    println();
-    print_strln(rangeFinderStatus);
-    if(rangeFinderReadyFlag == 0) {
-        print_strln(calibratingStatus);
-    }
-    else {
-        print_strln(readyStatus);
-    }
-    println();
-    print_strln(compassStatus);
-    if(compassReadyFlag == 0) {
-        print_strln(calibratingStatus);
-    }
-    else {
-        print_strln(readyStatus);
-    }
-    Display();
 }
 
 void getButtonPress(void *buttonPort) {
