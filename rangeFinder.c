@@ -89,6 +89,7 @@ int main(void) {
     param3.sched_priority = 80;
     //Display output has lowest priority
     param4.sched_priority = 20;
+    param5.sched_priority = 20;
 
     pthread_attr_setschedparam(&tattr1, &param1);
     pthread_attr_setschedparam(&tattr2, &param2);
