@@ -37,7 +37,7 @@ void getBno055Info();
 void getCalStatus();
 
 int gpsReadyFlag = 0;
-int compassReadyFlag = 0;
+int compassReadyFlag = 1;
 int rangeFinderReadyFlag = 0;
 
 pthread_mutex_t timerMutex;
