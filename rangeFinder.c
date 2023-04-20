@@ -269,29 +269,37 @@ double degreesToDecimal(double degreeCoord) {
 }
 
 void parseGPSMessage(char* message) {
-    //char testMessage[256] = "$GNGGA,202530.00,3051.8095,N,10036.0022,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
-
     if (strstr(message, "$GNGGA") != NULL) {
+        double latRawValue = 0.0;
+        char ns[1];
+        double longRawValue = 0.0;
+        char ew[1];
         printf("%s\n", message);
         char *p = message;
         p = strchr(p, ',')+1; //skip time
 
         p = strchr(p, ',')+1;
-        //loc->latitude = atof(p);
+        latRawValue = atof(p);
         printf("latitude: %f\n", atof(p));
+
         p = strchr(p, ',')+1;
+        ns = p[0];
         printf("latitude hemisphere: %c\n", p[0]);
 
         p = strchr(p, ',')+1;
-        //loc->longitude = atof(p);
+        longRawValue = atof(p);
         printf("longitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
+        ew = p[0];
         printf("longitude hemisphere: %c\n", p[0]);
 
-        printf("TESTING LAT: %f\n", degreesToDecimal(3051.8095));
-        printf("TESTING LONG: %f\n", degreesToDecimal(10036.0022));
-        newCoords(degreesToDecimal(3887.94), degreesToDecimal(-77228.294), 0, -500);
+        double latitude = (ns == 'N') ? *latRawValue : -1 * (*latRawValue);
+        double longitude = (we == 'E') ? *longRawValue : -1 * (*longRawValue);
+
+        printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
+        printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
+        newCoords(degreesToDecimal(latitude), degreesToDecimal(longitude), 0, -500);
         //GOOGLE MAPS TESTING newCoords(38.8794, -77.228294, 500, -500);
     }
 }
@@ -330,7 +338,10 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        parseGPSMessage(read_buf);
+        //parseGPSMessage(read_buf);
+        char testMessage[256] = "$GNGGA,202530.00,3852.458,N,07713.419,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+        //Apartment coords: 38°52'45.8"N 77°13'41.9"W
+        parseGPSMessage(testMessage);
         /////////////////////////////////////
     }
 }
