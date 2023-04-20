@@ -387,7 +387,7 @@ void parseGPSMessage() {
         //loc->latitude = atof(p);
         printf("latitude: %f\n", atof(p));
         p = strchr(p, ',')+1;
-        printf("latitude hemisphere: %s\n", p[0]);
+        printf("latitude hemisphere: %c\n", p[0]);
         /*switch (p[0]) {
             case 'N':
                 //loc->lat = 'N';
