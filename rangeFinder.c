@@ -31,6 +31,7 @@ void getButtonPress(void *buttonPort);
 void print_calstat();
 void bno055();
 void printCalibrationDisplay();
+void latLongDegToDecimal();
 void parseGPSMessage(char* message);
 void readGPS();
 void rangeFinder();
@@ -377,8 +378,21 @@ void bno055() {
      */
 }
 
+double degreesToDecimal(double degreeCoord) {
+    double ddeg;
+    double sec = modf(degreeCoord, &ddeg)*60;
+    int deg = (int)(ddeg/100);
+    int min = (int)(degreeCoord-(deg*100));
+
+    double absdlat = round(deg * 1000000.);
+    double absmlat = round(min * 1000000.);
+    double absslat = round(sec * 1000000.);
+
+    return round(absdlat + (absmlat/60) + (absslat/3600)) /1000000;
+}
+
 void parseGPSMessage(char* message) {
-    //char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+    char testMessage[256] = "$GNGGA,202530.00,3051.8095,N,10036.0022,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
 
     if (strstr(message, "$GNGGA") != NULL) {
         printf("%s\n", message);
@@ -398,6 +412,8 @@ void parseGPSMessage(char* message) {
         p = strchr(p, ',')+1;
         printf("longitude hemisphere: %c\n", p[0]);
     }
+    printf("TESTING: %f\n", degreesToDecimal(3051.8095));
+    printf("TESTING: %f\n", degreesToDecimal(10036.0022));
 }
 
 void readGPS() {
