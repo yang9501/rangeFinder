@@ -312,21 +312,45 @@ void bno055() {
     char i2c_bus[256] = I2CBUS;
 
     get_i2cbus(i2c_bus, senaddr);
+    ////////SET MODE
     int res = set_mode(gyronly);
     if(res != 0) {
         printf("Error: could not set sensor mode \n");
         exit(-1);
     }
+
+    ////////CALIBRATION STATUS
+    struct bnocal bnoCalibrate;
+    /* -------------------------------------------------------- *
+     *  Read the sensors calibration state                      *
+     * -------------------------------------------------------- */
+
+    int gyrCalReady = 0;
+    while(!gyrCalReady) {
+        res = get_calstatus(&bnoCalibrate);
+        if(res != 0) {
+            printf("Error: Cannot read calibration state.\n");
+            exit(-1);
+        }
+        printf("X:%d Y:%d Z:%d]\n", bnoc.goff_x, bnoc.goff_y, bnoc.goff_z);
+        if(bnoc.gcal_st == 3) {
+            gyrCalReady = 1;
+        }
+    }
+
     getBno055Info();
     getCalStatus();
     struct bnogyr bnod;
-    res = get_gyr(&bnod);
-    if(res != 0) {
-        printf("Error: Cannot read gyroscope data.\n");
-        exit(-1);
+    while(1) {
+        res = get_gyr(&bnod);
+        if(res != 0) {
+            printf("Error: Cannot read gyroscope data.\n");
+            exit(-1);
+        }
+
+        printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
     }
 
-    printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
     //struct bnoeul bnod;
     //res = get_eul(&bnod);
     //printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
