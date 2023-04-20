@@ -36,8 +36,8 @@ void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
-int gpsReadyFlag = 0;
-int rangeFinderReadyFlag = 0;
+int gpsReadyFlag = 1;
+int rangeFinderReadyFlag = 1;
 int compassReadyFlag = 1;
 
 pthread_mutex_t timerMutex;
@@ -526,7 +526,19 @@ void printCalibrationDisplay() {
             print_strln(readyStatus);
         }
         Display();
+
+        if(gpsReadyFlag == 1 && rangeFinderReadyFlag == 1 && compassReadyFlag == 1) {
+            sleep(3);
+            break;
+        }
     }
+
+    clearDisplay();
+
+    setTextSize(1);
+    setTextColor(WHITE);
+    setCursor(1, 0);
+    print_strln("Press button to receive target coordinates!");
 }
 
 void getButtonPress(void *buttonPort) {
