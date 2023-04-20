@@ -498,11 +498,11 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln("GPS Status: %s", gpsStatus);
+    print_strln(strcat("GPS Status: ", gpsStatus));
     println();
-    print_strln("Rangefinder Status: %s", rangeFinderStatus);
+    print_strln(strcat("Rangefinder Status: ", rangeFinderStatus));
     println();
-    print_strln("Compass Status: %s", compassStatus);
+    print_strln(strcat("Compass Status: ", compassStatus));
 
     Display();
 }
