@@ -491,11 +491,11 @@ void printDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln("GPS Status: ");
+    print_strln("GPS Status: Calibrating");
     println();
-    print_strln("Rangefinder Status: ");
+    print_strln("Rangefinder Status: Calibrating");
     println();
-    print_strln("Compass Status: ");
+    print_strln("Compass Status: Calibrating");
 
     Display();
 }
