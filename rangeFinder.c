@@ -394,6 +394,8 @@ void printDisplay() {
 }
 
 void readGPS() {
+    unsigned char cmd3[] = $CDCMD,33,1*7C;
+
     int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
@@ -405,6 +407,10 @@ void readGPS() {
     tcsetattr(serialPort, TCSANOW, &options);
 
     char read_buf [256];
+
+    printf("Antenna messages\n");
+    write(serialPort, cmd3, sizeof(cmd3));  //Turn visible laser on
+    sleep(1);
 
     while(1) {
         char c;
