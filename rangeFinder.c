@@ -512,6 +512,8 @@ void printCalibrationDisplay() {
     println();
     println();
     print_strln("12345678901234567890123");
+    print_strln("Author:Vinay Divakar");
+    print_strln("Author:Vinay Divakar");
     Display();
 }
 
