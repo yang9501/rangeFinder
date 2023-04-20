@@ -114,7 +114,7 @@ int main(void) {
     //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
-    //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
+    (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
