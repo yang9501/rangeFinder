@@ -511,6 +511,7 @@ void printCalibrationDisplay() {
     println();
     println();
     print_strln("THANK YOU");
+    Display();
 }
 
 void getButtonPress(void *buttonPort) {
