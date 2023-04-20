@@ -36,7 +36,7 @@ void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
-int gpsReadyFlag = 1;
+int gpsReadyFlag = 0;
 int rangeFinderReadyFlag = 1;
 int compassReadyFlag = 1;
 
@@ -545,6 +545,8 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
+    sleep(3);
+    gpsReadyFlag = 1;
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
