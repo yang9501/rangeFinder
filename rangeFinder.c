@@ -105,7 +105,7 @@ int main(void) {
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     //Display Thread
-    (void) pthread_create( &thread5, &tattr5, (void *) printCalibrationDisplay(), NULL);
+    (void) pthread_create( &thread5, &tattr5, (void *) printCalibrationDisplay, NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
