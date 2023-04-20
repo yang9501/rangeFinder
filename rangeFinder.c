@@ -506,8 +506,9 @@ void printCalibrationDisplay() {
     print_strln(strcat(rangeFinderStatusBase, rangeFinderStatus));
     println();
     print_strln(strcat(compassStatusBase, compassStatus));
-
+    printf("hello\n");
     Display();
+    printf("hi\n");
 }
 
 void getButtonPress(void *buttonPort) {
