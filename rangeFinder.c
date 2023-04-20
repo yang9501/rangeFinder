@@ -66,19 +66,21 @@ int main(void) {
     (void) pthread_mutex_init(&timerMutex, NULL);
 
     // Create independent threads each of which will execute function
-    pthread_t thread1, thread2, thread3, thread4;
-    pthread_attr_t tattr1, tattr2, tattr3, tattr4;
-    struct sched_param param1, param2, param3, param4;
+    pthread_t thread1, thread2, thread3, thread4, thread5;
+    pthread_attr_t tattr1, tattr2, tattr3, tattr4, tattr5;
+    struct sched_param param1, param2, param3, param4, param5;
 
     pthread_attr_init(&tattr1);
     pthread_attr_init(&tattr2);
     pthread_attr_init(&tattr3);
     pthread_attr_init(&tattr4);
+    pthread_attr_init(&tattr5);
 
     pthread_attr_getschedparam(&tattr1, &param1);
     pthread_attr_getschedparam(&tattr2, &param2);
     pthread_attr_getschedparam(&tattr3, &param3);
     pthread_attr_getschedparam(&tattr4, &param4);
+    pthread_attr_getschedparam(&tattr5, &param5);
 
     //Button priority is highest
     param1.sched_priority = 90;
@@ -92,6 +94,7 @@ int main(void) {
     pthread_attr_setschedparam(&tattr2, &param2);
     pthread_attr_setschedparam(&tattr3, &param3);
     pthread_attr_setschedparam(&tattr4, &param4);
+    pthread_attr_setschedparam(&tattr5, &param5);
 
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
@@ -101,7 +104,8 @@ int main(void) {
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
-
+    //Display Thread
+    (void) pthread_create( &thread5, &tattr5, (void *) printCalibrationDisplay(), NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
@@ -515,7 +519,6 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
