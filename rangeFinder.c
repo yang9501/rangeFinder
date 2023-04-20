@@ -351,8 +351,17 @@ void bno055() {
 
     getBno055Info();
     getCalStatus();
+
+    struct bnogyr bnod;
     while(1) {
         print_calstat();
+        res = get_gyr(&bnod);
+        if(res != 0) {
+            printf("Error: Cannot read gyroscope data.\n");
+            exit(-1);
+        }
+
+        printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
         sleep(2);
     }
     /*
