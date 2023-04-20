@@ -101,7 +101,6 @@ int main(void) {
     param3.sched_priority = 80;
     //Display output has lowest priority
     param4.sched_priority = 20;
-    param5.sched_priority = 20;
 
     pthread_attr_setschedparam(&tattr1, &param1);
     pthread_attr_setschedparam(&tattr2, &param2);
@@ -240,13 +239,6 @@ void bno055() {
     getCalStatus();
 
     while(1) {
-        print_calstat();
-        res = get_gyr(&bnod);
-        if(res != 0) {
-            printf("Error: Cannot read gyroscope data.\n");
-            exit(-1);
-        }
-
         struct bnoeul bnodEul;
         res = get_eul(&bnodEul);
         printf("EUL %3.4f %3.4f %3.4f\n", bnodEul.eul_head, bnodEul.eul_roll, bnodEul.eul_pitc);
