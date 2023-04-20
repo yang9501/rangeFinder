@@ -486,6 +486,11 @@ void printCalibrationDisplay() {
         printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
         exit(1);
     }
+
+    char gpsStatusBase[] = "Calibrating";
+    char rangeFinderStatusBase[] = "Calibrating";
+    char compassStatusBase[] = "Calibrating";
+
     char gpsStatus[] = "Calibrating";
     char rangeFinderStatus[] = "Calibrating";
     char compassStatus[] = "Calibrating";
@@ -498,11 +503,11 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln(strcat("GPS Status: ", gpsStatus));
+    print_strln(strcat(gpesStatsBase, gpsStatus));
     println();
-    print_strln(strcat("Rangefinder Status: ", rangeFinderStatus));
+    print_strln(strcat(rangeFinderStatusBase, rangeFinderStatus));
     println();
-    print_strln(strcat("Compass Status: ", compassStatus));
+    print_strln(strcat(compassStatusBase, compassStatus));
 
     Display();
 }
