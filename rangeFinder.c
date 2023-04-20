@@ -503,7 +503,7 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln(strcat(gpesStatsBase, gpsStatus));
+    print_strln(strcat(gpsStatsBase, gpsStatus));
     println();
     print_strln(strcat(rangeFinderStatusBase, rangeFinderStatus));
     println();
