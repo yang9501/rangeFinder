@@ -326,7 +326,7 @@ void bno055() {
      * -------------------------------------------------------- */
 
     int gyrCalReady = 0;
-    while(!gyrCalReady) {
+    /*while(!gyrCalReady) {
         res = get_calstatus(&bnoCalibrate);
         if(res != 0) {
             printf("Error: Cannot read calibration state.\n");
@@ -336,7 +336,7 @@ void bno055() {
         if(bnoCalibrate.gcal_st == 3) {
             gyrCalReady = 1;
         }
-    }
+    }*/
 
     getBno055Info();
     getCalStatus();
