@@ -379,7 +379,8 @@ void bno055() {
 
 void parseGPSMessage() {
     char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
-    if (strstr(message, "$GPGGA") != NULL) {
+    if (strstr(testMessage, "$GPGGA") != NULL) {
+        char *p = testMessage;
         p = strchr(p, ',')+1; //skip time
 
         p = strchr(p, ',')+1;
@@ -416,8 +417,7 @@ void parseGPSMessage() {
             case ',':
                 loc->lon = '\0';
                 break;
-        }*/
-        /*
+        }
         p = strchr(p, ',')+1;
         loc->quality = (uint8_t)atoi(p);
 
