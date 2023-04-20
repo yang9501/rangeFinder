@@ -489,13 +489,9 @@ void printCalibrationDisplay() {
         exit(1);
     }
 
-    char gpsStatusBase[] = "Cali";
-    char rangeFinderStatusBase[] = "Calib";
-    char compassStatusBase[] = "Cali";
-
-    char gpsStatus[] = "Calibrating";
-    char rangeFinderStatus[] = "Cali";
-    char compassStatus[] = "Calib";
+    char gpsStatus[] = "GPS Status: ";
+    char rangeFinderStatus[] = "Rangefinder Status: ";
+    char compassStatus[] = "Compass Status: ";
 
     display_Init_seq();
 
@@ -505,15 +501,11 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln("deeplyembedded.org");
+    print_strln(gpsStatus);
     println();
-    print_strln("Author:Vinay Divakar");
+    print_strln(rangeFinderStatus);
     println();
-    println();
-    println();
-    print_strln("12345678901234567890123");
-    print_strln("Author:Vinay Divakar");
-    print_strln("Author:Vinay Divakar");
+    print_strln(compassStatus);
     Display();
 }
 
