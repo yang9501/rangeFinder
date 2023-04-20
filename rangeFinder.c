@@ -433,7 +433,7 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        parseGPSMessage(read_buf);
+        parseGPSMessage(read_buf); 
         /////////////////////////////////////
     }
 }
