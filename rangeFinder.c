@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/types.h>
+#include <math.h>
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/SSD1306_OLED_Library/SSD1306_OLED.h"
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/I2C_Library/I2C.h"
 #include "pi-bno055-master/getbno055.h"
