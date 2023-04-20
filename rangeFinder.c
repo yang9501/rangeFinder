@@ -325,6 +325,9 @@ void bno055() {
      *  Read the sensors calibration state                      *
      * -------------------------------------------------------- */
 
+    getBno055Info();
+    getCalStatus();
+    /*
     int gyrCalReady = 0;
     while(!gyrCalReady) {
         res = get_calstatus(&bnoCalibrate);
@@ -338,8 +341,6 @@ void bno055() {
         }
     }
 
-    getBno055Info();
-    getCalStatus();
     struct bnogyr bnod;
     while(1) {
         res = get_gyr(&bnod);
@@ -357,6 +358,7 @@ void bno055() {
     //struct bnomag bnodMag;
     //res = get_mag(&bnodMag);
     //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+     */
 }
 
 
