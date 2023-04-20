@@ -444,7 +444,7 @@ void readGPS() {
 
     char read_buf [256];
 
-    char antennaCmd[] = "$CDCMD,33,1*7C"
+    char antennaCmd[] = "$CDCMD,33,1*7C";
 
     printf("Resolution to 1mm\n");
     write(serialPort, antennaCmd, sizeof(antennaCmd));  //Set resolution to 1mm
@@ -614,7 +614,7 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    parseGPSMessage()
+    parseGPSMessage();
     printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
