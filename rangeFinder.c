@@ -313,7 +313,7 @@ void bno055() {
 
     get_i2cbus(i2c_bus, senaddr);
     ////////SET MODE
-    int res = set_mode(gyronly);
+    int res = set_mode(compass);
     if(res != 0) {
         printf("Error: could not set sensor mode \n");
         exit(-1);
