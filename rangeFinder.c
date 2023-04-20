@@ -332,7 +332,7 @@ void bno055() {
             printf("Error: Cannot read calibration state.\n");
             exit(-1);
         }
-        printf("X:%d Y:%d Z:%d]\n", bnoCalibrate.goff_x, bnoCalibrate.goff_y, bnoCalibrate.goff_z);
+        printf(" gyr [S:%d ", bnoc.gcal_st);
         if(bnoCalibrate.gcal_st == 3) {
             gyrCalReady = 1;
         }
