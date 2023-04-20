@@ -506,8 +506,10 @@ void printCalibrationDisplay() {
     setCursor(1,0);
     print_strln(gpsStatus);
     print_strln(calibratingStatus);
+    println();
     print_strln(rangeFinderStatus);
     print_strln(calibratingStatus);
+    println();
     print_strln(compassStatus);
     print_strln(calibratingStatus);
     Display();
