@@ -242,7 +242,7 @@ void bno055() {
         struct bnoeul bnodEul;
         res = get_eul(&bnodEul);
         printf("EUL %3.4f %3.4f %3.4f\n", bnodEul.eul_head, bnodEul.eul_roll, bnodEul.eul_pitc);
-        usleep(100000);
+        usleep(1000000);
     }
 }
 
@@ -403,7 +403,7 @@ void rangeFinder() {
         if (n < 0) {
             printf("Unresponsive\n");
         } else {
-            printf("Raw data: %s\n", read_buf);
+            //printf("Raw data: %s\n", read_buf);
             strncpy(test_buf, read_buf + 3, 7);
             /////////////TODO: MUTEX AND INFODUMP HERE
             printf("Parsed: %s\n", test_buf);
