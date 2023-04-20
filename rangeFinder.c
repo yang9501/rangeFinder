@@ -32,6 +32,8 @@ void getButtonPress(void *buttonPort);
 void print_calstat();
 void bno055();
 void printCalibrationDisplay();
+double degreesToDecimal(double degreeCoord);
+double newCoords(double initLat, double initLong, double dx, double dy);
 void latLongDegToDecimal();
 void parseGPSMessage(char* message);
 void readGPS();
@@ -379,6 +381,15 @@ void bno055() {
      */
 }
 
+double newCoords(double initLat, double initLong, double dx, double dy) {
+    //https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
+    double earthRadiusMeters = 6378 * 1000;
+    double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
+    double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
+    printf("new lat: %f\n", newLat);
+    printf("new long: %f\n", newLong);
+}
+
 double degreesToDecimal(double degreeCoord) {
     double ddeg;
     double sec = modf(degreeCoord, &ddeg)*60;
@@ -393,7 +404,7 @@ double degreesToDecimal(double degreeCoord) {
 }
 
 void parseGPSMessage(char* message) {
-    char testMessage[256] = "$GNGGA,202530.00,3051.8095,N,10036.0022,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+    //char testMessage[256] = "$GNGGA,202530.00,3051.8095,N,10036.0022,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
 
     if (strstr(message, "$GNGGA") != NULL) {
         printf("%s\n", message);
@@ -412,9 +423,11 @@ void parseGPSMessage(char* message) {
 
         p = strchr(p, ',')+1;
         printf("longitude hemisphere: %c\n", p[0]);
+
+        printf("TESTING LAT: %f\n", degreesToDecimal(3051.8095));
+        printf("TESTING LONG: %f\n", degreesToDecimal(10036.0022));
+        newCoords(degreesToDecimal(3051.8095), degreesToDecimal(10036.0022), 0, -500);
     }
-    printf("TESTING: %f\n", degreesToDecimal(3051.8095));
-    printf("TESTING: %f\n", degreesToDecimal(10036.0022));
 }
 
 void readGPS() {
