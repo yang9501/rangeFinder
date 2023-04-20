@@ -405,7 +405,7 @@ void parseGPSMessage() {
         printf("longitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
-        printf("longitude hemisphere: %s\n", p[0]);
+        printf("longitude hemisphere: %c\n", p[0]);
 
         /*switch (p[0]) {
             case 'W':
