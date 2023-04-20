@@ -388,17 +388,6 @@ void parseGPSMessage() {
         printf("latitude: %f\n", atof(p));
         p = strchr(p, ',')+1;
         printf("latitude hemisphere: %c\n", p[0]);
-        /*switch (p[0]) {
-            case 'N':
-                //loc->lat = 'N';
-                break;
-            case 'S':
-                //loc->lat = 'S';
-                break;
-            case ',':
-                //loc->lat = '\0';
-                break;
-        }*/
 
         p = strchr(p, ',')+1;
         //loc->longitude = atof(p);
@@ -406,28 +395,6 @@ void parseGPSMessage() {
 
         p = strchr(p, ',')+1;
         printf("longitude hemisphere: %c\n", p[0]);
-
-        /*switch (p[0]) {
-            case 'W':
-                loc->lon = 'W';
-                break;
-            case 'E':
-                loc->lon = 'E';
-                break;
-            case ',':
-                loc->lon = '\0';
-                break;
-        }
-        p = strchr(p, ',')+1;
-        loc->quality = (uint8_t)atoi(p);
-
-        p = strchr(p, ',')+1;
-        loc->satellites = (uint8_t)atoi(p);
-
-        p = strchr(p, ',')+1;
-
-        p = strchr(p, ',')+1;
-        loc->altitude = atof(p);*/
     }
 }
 
@@ -606,7 +573,9 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1, 0);
-    print_strln("Press button to receive target coordinates!");
+    print_strln("Press button to");
+    print_strln("receive target ");
+    print_strln("location!");
     Display();
 }
 
