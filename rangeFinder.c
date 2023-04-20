@@ -36,7 +36,7 @@ void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
-int gpsReadyFlag = 0;
+int gpsReadyFlag = 1;
 int rangeFinderReadyFlag = 1;
 int compassReadyFlag = 1;
 
