@@ -541,6 +541,7 @@ void printCalibrationDisplay() {
     setTextColor(WHITE);
     setCursor(1, 0);
     print_strln("Press button to receive target coordinates!");
+    Display();
 }
 
 void getButtonPress(void *buttonPort) {
