@@ -426,7 +426,7 @@ void parseGPSMessage(char* message) {
 
         printf("TESTING LAT: %f\n", degreesToDecimal(3051.8095));
         printf("TESTING LONG: %f\n", degreesToDecimal(10036.0022));
-        newCoords(degreesToDecimal(3051.8095), degreesToDecimal(10036.0022), 0, -500);
+        newCoords(degreesToDecimal(3887.94), degreesToDecimal(-77228.294), 0, -500);
     }
 }
 
