@@ -362,6 +362,9 @@ void bno055() {
         }
 
         printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
+        struct bnoeul bnodEul;
+        res = get_eul(&bnodEul);
+        printf("EUL %3.4f %3.4f %3.4f\n", bnodEul.eul_head, bnodEul.eul_roll, bnodEul.eul_pitc);
         sleep(2);
     }
     /*
@@ -389,12 +392,12 @@ void bno055() {
         printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
     }
 
-    //struct bnoeul bnod;
-    //res = get_eul(&bnod);
-    //printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
-    //struct bnomag bnodMag;
-    //res = get_mag(&bnodMag);
-    //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+    struct bnoeul bnod;
+    res = get_eul(&bnod);
+    printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
+    struct bnomag bnodMag;
+    res = get_mag(&bnodMag);
+    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
      */
 }
 
