@@ -294,8 +294,8 @@ void parseGPSMessage(char* message) {
         ew = p[0];
         printf("longitude hemisphere: %c\n", p[0]);
 
-        double latitude = (ns == 'N') ? *latRawValue : -1 * (*latRawValue);
-        double longitude = (we == 'E') ? *longRawValue : -1 * (*longRawValue);
+        double latitude = (ns == 'N') ? latRawValue : -1 * (latRawValue);
+        double longitude = (we == 'E') ? longRawValue : -1 * (longRawValue);
 
         printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
         printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
