@@ -493,6 +493,9 @@ void printCalibrationDisplay() {
     char rangeFinderStatus[] = "Rangefinder Status: ";
     char compassStatus[] = "Compass Status: ";
 
+    char calibratingStatus[] = "Calibrating";
+    char readyStatus[] = "Ready";
+
     display_Init_seq();
 
     /* Clear display */
@@ -502,10 +505,11 @@ void printCalibrationDisplay() {
     setTextColor(WHITE);
     setCursor(1,0);
     print_strln(gpsStatus);
-    println();
+    print_strln(calibratingStatus);
     print_strln(rangeFinderStatus);
-    println();
+    print_strln(calibratingStatus);
     print_strln(compassStatus);
+    print_strln(calibratingStatus);
     Display();
 }
 
