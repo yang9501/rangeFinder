@@ -31,7 +31,7 @@ void getButtonPress(void *buttonPort);
 void print_calstat();
 void bno055();
 void printCalibrationDisplay();
-void parseGPSMessage();
+void parseGPSMessage(char* message);
 void readGPS();
 void rangeFinder();
 void getBno055Info();
@@ -109,7 +109,7 @@ int main(void) {
     //Thread
     //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     //Display Thread
@@ -377,10 +377,11 @@ void bno055() {
      */
 }
 
-void parseGPSMessage() {
-    char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
-    if (strstr(testMessage, "$GPGGA") != NULL) {
-        char *p = testMessage;
+void parseGPSMessage(char* message) {
+    //char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+    printf("%s\n", message);
+    if (strstr(message, "$GPGGA") != NULL) {
+        char *p = message;
         p = strchr(p, ',')+1; //skip time
 
         p = strchr(p, ',')+1;
@@ -413,8 +414,7 @@ void readGPS() {
 
     char antennaCmd[] = "$CDCMD,33,1*7C";
 
-    printf("Resolution to 1mm\n");
-    write(serialPort, antennaCmd, sizeof(antennaCmd));  //Set resolution to 1mm
+    write(serialPort, antennaCmd, sizeof(antennaCmd));
     sleep(1);
 
     while(1) {
@@ -433,8 +433,7 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        printf("%s\n", read_buf);
-        fflush(stdout);
+        parseGPSMessage(read_buf);
         /////////////////////////////////////
     }
 }
@@ -583,7 +582,6 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    parseGPSMessage();
     printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
