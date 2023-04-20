@@ -509,8 +509,9 @@ void printCalibrationDisplay() {
     println();
     print_strln("Author:Vinay Divakar");
     println();
-    println();
     print_strln("12345678901234567890123");
+    println();
+    println();
     Display();
 }
 
