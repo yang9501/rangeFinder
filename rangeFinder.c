@@ -283,7 +283,7 @@ void parseGPSMessage(char* message) {
         printf("latitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
-        ns = p[0];
+        ns = strcpy(p[0]);
         printf("latitude hemisphere: %c\n", p[0]);
 
         p = strchr(p, ',')+1;
@@ -291,11 +291,11 @@ void parseGPSMessage(char* message) {
         printf("longitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
-        ew = p[0];
+        ew = strcpy(p[0]);
         printf("longitude hemisphere: %c\n", p[0]);
 
         double latitude = (ns == 'N') ? latRawValue : -1 * (latRawValue);
-        double longitude = (we == 'E') ? longRawValue : -1 * (longRawValue);
+        double longitude = (ew == 'E') ? longRawValue : -1 * (longRawValue);
 
         printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
         printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
