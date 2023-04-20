@@ -394,7 +394,7 @@ void printDisplay() {
 }
 
 void readGPS() {
-    unsigned char cmd3[] = "$PGCMD,33,1*6C";
+    unsigned char cmd3[] = "$PMTK314,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28";
 
     int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
