@@ -36,7 +36,7 @@ void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
-int gyroReadyFlag = 0;
+int gpsReadyFlag = 0;
 int compassReadyFlag = 0;
 int rangeFinderReadyFlag = 0;
 
@@ -505,13 +505,28 @@ void printCalibrationDisplay() {
     setTextColor(WHITE);
     setCursor(1,0);
     print_strln(gpsStatus);
-    print_strln(calibratingStatus);
+    if(gpsReadyFlag == 0) {
+        print_strln(calibratingStatus);
+    }
+    else {
+        print_strln(readyStatus);
+    }
     println();
     print_strln(rangeFinderStatus);
-    print_strln(calibratingStatus);
+    if(rangeFinderReadyFlag == 0) {
+        print_strln(calibratingStatus);
+    }
+    else {
+        print_strln(readyStatus);
+    }
     println();
     print_strln(compassStatus);
-    print_strln(calibratingStatus);
+    if(compassReadyFlag == 0) {
+        print_strln(calibratingStatus);
+    }
+    else {
+        print_strln(readyStatus);
+    }
     Display();
 }
 
