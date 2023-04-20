@@ -322,8 +322,9 @@ void bno055() {
     struct bnoeul bnod;
     res = get_eul(&bnod);
     printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
-    res = get_mag(&bnod);
-    printf("MAG %3.2f %3.2f %3.2f\n", bnod.mdata_x, bnod.mdata_y, bnod.mdata_z);
+    struct bnomag bnodMag;
+    res = get_mag(&bnodMag);
+    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 }
 
 
