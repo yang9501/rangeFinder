@@ -510,7 +510,7 @@ void printCalibrationDisplay() {
     print_strln("Author:Vinay Divakar");
     println();
     println();
-    print_strln("THANK YOU");
+    print_strln("12345678901234567890");
     Display();
 }
 
