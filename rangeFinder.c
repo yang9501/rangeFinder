@@ -36,6 +36,10 @@ void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
+int gyroReadyFlag = 0;
+int compassReadyFlag = 0;
+int rangeFinderReadyFlag = 0;
+
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
 
@@ -471,7 +475,7 @@ void rangeFinder() {
     }
 }
 
-void printDisplay() {
+void printCalibrationDisplay() {
     /* Initialize I2C bus and connect to the I2C Device */
     if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
     {
@@ -482,6 +486,9 @@ void printDisplay() {
         printf("(Main)i2c-2: OOPS! Something Went Wrong\r\n");
         exit(1);
     }
+    char gpsStatus[] = "Calibrating";
+    char rangeFinderStatus[] = "Calibrating";
+    char compassStatus[] = "Calibrating";
 
     display_Init_seq();
 
@@ -491,11 +498,11 @@ void printDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln("GPS Status: Calibrating");
+    print_strln("GPS Status: %s", gpsStatus);
     println();
-    print_strln("Rangefinder Status: Calibrating");
+    print_strln("Rangefinder Status: %s", rangeFinderStatus);
     println();
-    print_strln("Compass Status: Calibrating");
+    print_strln("Compass Status: %s", compassStatus);
 
     Display();
 }
@@ -504,7 +511,7 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    printDisplay();
+    printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
