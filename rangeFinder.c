@@ -527,6 +527,7 @@ void printCalibrationDisplay() {
         }
         Display();
         if(gpsReadyFlag == 1 && rangeFinderReadyFlag == 1 && compassReadyFlag == 1) {
+            printf("BREAKING\n");
             sleep(3);
             break;
         }
