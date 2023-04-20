@@ -532,7 +532,7 @@ void printCalibrationDisplay() {
         }
         sleep(1);
     }
-
+    printf("HELLOKLDFJLKDSJF\n");
     clearDisplay();
 
     setTextSize(1);
