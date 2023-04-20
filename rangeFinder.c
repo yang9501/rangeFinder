@@ -42,9 +42,9 @@ void getBno055Info();
 void getCalStatus();
 
 ///////DATA VARIABLES
-int gpsReadyFlag = 1;
-int rangeFinderReadyFlag = 1;
-int compassReadyFlag = 1;
+int gpsReadyFlag = 0;
+int rangeFinderReadyFlag = 0;
+int compassReadyFlag = 0;
 
 double latitude = 0.0;
 double longitude = 0.0;
@@ -82,20 +82,17 @@ int main(void) {
 
     // Create independent threads each of which will execute function
     pthread_t thread1, thread2, thread3, thread4, thread5;
-    pthread_attr_t tattr1, tattr2, tattr3, tattr4, tattr5;
-    struct sched_param param1, param2, param3, param4, param5;
+    pthread_attr_t tattr1, tattr2, tattr3, tattr4;
+    struct sched_param param1, param2, param3, param4;
 
     pthread_attr_init(&tattr1);
     pthread_attr_init(&tattr2);
     pthread_attr_init(&tattr3);
     pthread_attr_init(&tattr4);
-    pthread_attr_init(&tattr5);
-
     pthread_attr_getschedparam(&tattr1, &param1);
     pthread_attr_getschedparam(&tattr2, &param2);
     pthread_attr_getschedparam(&tattr3, &param3);
     pthread_attr_getschedparam(&tattr4, &param4);
-    pthread_attr_getschedparam(&tattr5, &param5);
 
     //Button priority is highest
     param1.sched_priority = 90;
@@ -110,7 +107,6 @@ int main(void) {
     pthread_attr_setschedparam(&tattr2, &param2);
     pthread_attr_setschedparam(&tattr3, &param3);
     pthread_attr_setschedparam(&tattr4, &param4);
-    pthread_attr_setschedparam(&tattr5, &param5);
 
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
@@ -120,8 +116,6 @@ int main(void) {
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
-    //Display Thread
-    //(void) pthread_create( &thread5, &tattr5, (void *) printCalibrationDisplay, NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
@@ -211,124 +205,18 @@ void getCalStatus() {
     /* -------------------------------------------------------- *
      *  Read the sensors calibration state                      *
      * -------------------------------------------------------- */
-    int res = get_calstatus(&bnoc);
-    if(res != 0) {
-        printf("Error: Cannot read calibration state.\n");
-        exit(-1);
-    }
-    /* -------------------------------------------------------- *
-     *  Read the sensors calibration offset                     *
-     * -------------------------------------------------------- */
-    res = get_caloffset(&bnoc);
-    if(res != 0) {
-        printf("Error: Cannot read calibration data.\n");
-        exit(-1);
+    while (1) {
+        get_calstatus(&bnoc);
+        printf("sys [S:%d]", bnoc.scal_st);
+        if(bnoc.scal_st == 3) {
+            //////////TODO ADD MUTEX
+            compassReadyFlag = 1;
+            //////////TODO ADD MUTEX
+            break;
+        }
     }
 
-    /* -------------------------------------------------------- *
-     *  Print the calibration data line                         *
-     * -------------------------------------------------------- */
-    printf("sys [S:%d]", bnoc.scal_st);
-    printf(" acc [S:%d ", bnoc.acal_st);
-    printf("X:%d Y:%d Z:%d", bnoc.aoff_x, bnoc.aoff_y, bnoc.aoff_z);
-    printf(" R:%d]", bnoc.acc_rad);
 
-    printf(" mag [S:%d ", bnoc.mcal_st);
-    printf("X:%d Y:%d Z:%d", bnoc.moff_x, bnoc.moff_y, bnoc.moff_z);
-    printf(" R:%d]", bnoc.mag_rad);
-
-    printf(" gyr [S:%d ", bnoc.gcal_st);
-    printf("X:%d Y:%d Z:%d]\n", bnoc.goff_x, bnoc.goff_y, bnoc.goff_z);
-}
-
-void getBno055Info() {
-    struct bnoinf bnoi;
-    int res = get_inf(&bnoi);
-    /* ----------------------------------------------------------- *
-       * print the formatted output strings to stdout                *
-       * ----------------------------------------------------------- */
-    printf("\nBN0055 Information");
-    printf("----------------------------------------------\n");
-    printf("   Chip Version ID = 0x%02X\n", bnoi.chip_id);
-    printf("  Accelerometer ID = 0x%02X\n", bnoi.acc_id);
-    printf("      Gyroscope ID = 0x%02X\n", bnoi.gyr_id);
-    printf("   Magnetoscope ID = 0x%02X\n", bnoi.mag_id);
-    printf("  Software Version = %d.%d\n", bnoi.sw_msb, bnoi.sw_lsb);
-    printf("   Operations Mode = "); print_mode(bnoi.opr_mode);
-    printf("        Power Mode = "); print_power(bnoi.pwr_mode);
-    printf("Axis Configuration = "); print_remap_conf(bnoi.axr_conf);
-    printf("   Axis Remap Sign = "); print_remap_sign(bnoi.axr_sign);
-    printf("System Status Code = "); print_sstat(bnoi.sys_stat);
-    printf("System Clocksource = "); print_clksrc();
-
-    printf("Accelerometer Test = ");
-    if((bnoi.selftest >> 0) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf(" Magnetometer Test = ");
-    if((bnoi.selftest >> 1) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf("    Gyroscope Test = ");
-    if((bnoi.selftest >> 2) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf("MCU Cortex M0 Test = ");
-    if((bnoi.selftest >> 3) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf(" System Error Code = ");
-    switch(bnoi.sys_err) {
-        case 0x00:
-            printf("No Error\n");
-            break;
-        case 0x01:
-            printf("Peripheral initialization error\n");
-            break;
-        case 0x02:
-            printf("System initializion error\n");
-            break;
-        case 0x03:
-            printf("Selftest result failed\n");
-            break;
-        case 0x04:
-            printf("Register map value out of range\n");
-            break;
-        case 0x05:
-            printf("Register map address out of range\n");
-            break;
-        case 0x06:
-            printf("Register map write error\n");
-            break;
-        case 0x07:
-            printf("BNO low power mode not available\n");
-            break;
-        case 0x08:
-            printf("Accelerometer power mode not available\n");
-            break;
-        case 0x09:
-            printf("Fusion algorithm configuration error\n");
-            break;
-        case 0x0A:
-            printf("Sensor configuration error\n");
-            break;
-    }
-
-    print_unit(bnoi.unitsel);
-
-    printf("Sensor Temperature = ");
-    if(bnoi.opr_mode > 0) {
-        if((bnoi.unitsel >> 4) & 0x01) printf("%d°F\n", bnoi.temp_val);
-        else printf("%d°C\n",bnoi.temp_val);
-    }
-    else  printf("no data in CONFIG mode\n");
-
-    printf("\n----------------------------------------------\n");
-    struct bnoaconf bnoac;
-    if(get_acc_conf(&bnoac) == 0) print_acc_conf(&bnoac);
-
-    printf("\n----------------------------------------------\n");
-    print_calstat();
 }
 
 void bno055() {
@@ -344,15 +232,13 @@ void bno055() {
     }
 
     ////////CALIBRATION STATUS
-    struct bnocal bnoCalibrate;
     /* -------------------------------------------------------- *
      *  Read the sensors calibration state                      *
      * -------------------------------------------------------- */
 
-    getBno055Info();
+    //getBno055Info();
     getCalStatus();
 
-    struct bnogyr bnod;
     while(1) {
         print_calstat();
         res = get_gyr(&bnod);
@@ -361,44 +247,11 @@ void bno055() {
             exit(-1);
         }
 
-        printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
         struct bnoeul bnodEul;
         res = get_eul(&bnodEul);
         printf("EUL %3.4f %3.4f %3.4f\n", bnodEul.eul_head, bnodEul.eul_roll, bnodEul.eul_pitc);
-        sleep(2);
+        usleep(100000);
     }
-    /*
-    int gyrCalReady = 0;
-    while(!gyrCalReady) {
-        res = get_calstatus(&bnoCalibrate);
-        if(res != 0) {
-            printf("Error: Cannot read calibration state.\n");
-            exit(-1);
-        }
-        printf(" gyr [S:%d ", bnoCalibrate.gcal_st);
-        if(bnoCalibrate.gcal_st == 3) {
-            gyrCalReady = 1;
-        }
-    }
-
-    struct bnogyr bnod;
-    while(1) {
-        res = get_gyr(&bnod);
-        if(res != 0) {
-            printf("Error: Cannot read gyroscope data.\n");
-            exit(-1);
-        }
-
-        printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
-    }
-
-    struct bnoeul bnod;
-    res = get_eul(&bnod);
-    printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
-    struct bnomag bnodMag;
-    res = get_mag(&bnodMag);
-    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
-     */
 }
 
 double newCoords(double initLat, double initLong, double dx, double dy) {
@@ -546,6 +399,11 @@ void rangeFinder() {
 
     char read_buf [256];
     char test_buf [256];
+
+    ////////TODO ADD MUTEX HERE
+    rangeFinderReadyFlag = 1;
+    ////////TODO ADD MUTEX HERE
+
     printf("Beginning read\n");
     while(1) {
         int n = read(serialPort, (void *) (&read_buf), 11);
@@ -591,6 +449,7 @@ void printCalibrationDisplay() {
         setTextColor(WHITE);
         setCursor(1, 0);
 
+        /////////TODO ADD MUTEXES HERE
         print_strln(gpsStatus);
         if (gpsReadyFlag == 0) {
             print_strln(calibratingStatus);
@@ -617,6 +476,7 @@ void printCalibrationDisplay() {
             sleep(2);
             break;
         }
+        /////////TODO ADD MUTEXES HERE
         sleep(1);
     }
     clearDisplay();
@@ -680,4 +540,95 @@ static void writeGPIO(char *filename, char *port, char *value) {
     fp = fopen(fullFileName, "w+"); //open file for writing
     (void) fprintf(fp, "%s", value); // send value to the file
     (void) fclose(fp); //close the file using the file pointer
+}
+
+
+void getBno055Info() {
+    struct bnoinf bnoi;
+    int res = get_inf(&bnoi);
+    /* ----------------------------------------------------------- *
+       * print the formatted output strings to stdout                *
+       * ----------------------------------------------------------- */
+    printf("\nBN0055 Information");
+    printf("----------------------------------------------\n");
+    printf("   Chip Version ID = 0x%02X\n", bnoi.chip_id);
+    printf("  Accelerometer ID = 0x%02X\n", bnoi.acc_id);
+    printf("      Gyroscope ID = 0x%02X\n", bnoi.gyr_id);
+    printf("   Magnetoscope ID = 0x%02X\n", bnoi.mag_id);
+    printf("  Software Version = %d.%d\n", bnoi.sw_msb, bnoi.sw_lsb);
+    printf("   Operations Mode = "); print_mode(bnoi.opr_mode);
+    printf("        Power Mode = "); print_power(bnoi.pwr_mode);
+    printf("Axis Configuration = "); print_remap_conf(bnoi.axr_conf);
+    printf("   Axis Remap Sign = "); print_remap_sign(bnoi.axr_sign);
+    printf("System Status Code = "); print_sstat(bnoi.sys_stat);
+    printf("System Clocksource = "); print_clksrc();
+
+    printf("Accelerometer Test = ");
+    if((bnoi.selftest >> 0) & 0x01) printf("OK\n");
+    else printf("FAIL\n");
+
+    printf(" Magnetometer Test = ");
+    if((bnoi.selftest >> 1) & 0x01) printf("OK\n");
+    else printf("FAIL\n");
+
+    printf("    Gyroscope Test = ");
+    if((bnoi.selftest >> 2) & 0x01) printf("OK\n");
+    else printf("FAIL\n");
+
+    printf("MCU Cortex M0 Test = ");
+    if((bnoi.selftest >> 3) & 0x01) printf("OK\n");
+    else printf("FAIL\n");
+
+    printf(" System Error Code = ");
+    switch(bnoi.sys_err) {
+        case 0x00:
+            printf("No Error\n");
+            break;
+        case 0x01:
+            printf("Peripheral initialization error\n");
+            break;
+        case 0x02:
+            printf("System initializion error\n");
+            break;
+        case 0x03:
+            printf("Selftest result failed\n");
+            break;
+        case 0x04:
+            printf("Register map value out of range\n");
+            break;
+        case 0x05:
+            printf("Register map address out of range\n");
+            break;
+        case 0x06:
+            printf("Register map write error\n");
+            break;
+        case 0x07:
+            printf("BNO low power mode not available\n");
+            break;
+        case 0x08:
+            printf("Accelerometer power mode not available\n");
+            break;
+        case 0x09:
+            printf("Fusion algorithm configuration error\n");
+            break;
+        case 0x0A:
+            printf("Sensor configuration error\n");
+            break;
+    }
+
+    print_unit(bnoi.unitsel);
+
+    printf("Sensor Temperature = ");
+    if(bnoi.opr_mode > 0) {
+        if((bnoi.unitsel >> 4) & 0x01) printf("%d°F\n", bnoi.temp_val);
+        else printf("%d°C\n",bnoi.temp_val);
+    }
+    else  printf("no data in CONFIG mode\n");
+
+    printf("\n----------------------------------------------\n");
+    struct bnoaconf bnoac;
+    if(get_acc_conf(&bnoac) == 0) print_acc_conf(&bnoac);
+
+    printf("\n----------------------------------------------\n");
+    print_calstat();
 }
