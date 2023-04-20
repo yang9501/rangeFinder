@@ -526,11 +526,11 @@ void printCalibrationDisplay() {
             print_strln(readyStatus);
         }
         Display();
-
         if(gpsReadyFlag == 1 && rangeFinderReadyFlag == 1 && compassReadyFlag == 1) {
             sleep(3);
             break;
         }
+        sleep(1);
     }
 
     clearDisplay();
