@@ -321,6 +321,7 @@ void bno055() {
     getCalStatus();
     struct bnoeul bnod;
     res = get_eul(&bnod);
+    printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
 }
 
 
