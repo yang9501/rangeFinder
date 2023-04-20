@@ -31,14 +31,21 @@ void getButtonPress(void *buttonPort);
 void print_calstat();
 void bno055();
 void printCalibrationDisplay();
+void parseGPSMessage();
 void readGPS();
 void rangeFinder();
 void getBno055Info();
 void getCalStatus();
 
+///////DATA VARIABLES
 int gpsReadyFlag = 1;
 int rangeFinderReadyFlag = 1;
 int compassReadyFlag = 1;
+
+char latitude[256];
+char longitude[256];
+
+
 
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
@@ -370,6 +377,60 @@ void bno055() {
      */
 }
 
+void parseGPSMessage() {
+    char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+    if (strstr(message, "$GPGGA") != NULL) {
+        p = strchr(p, ',')+1; //skip time
+
+        p = strchr(p, ',')+1;
+        //loc->latitude = atof(p);
+        printf("latitude: %f\n", atof(p));
+        p = strchr(p, ',')+1;
+        printf("latitude hemisphere: %s\n", p[0]);
+        /*switch (p[0]) {
+            case 'N':
+                //loc->lat = 'N';
+                break;
+            case 'S':
+                //loc->lat = 'S';
+                break;
+            case ',':
+                //loc->lat = '\0';
+                break;
+        }*/
+
+        p = strchr(p, ',')+1;
+        //loc->longitude = atof(p);
+        printf("longitude: %f\n", atof(p));
+
+        p = strchr(p, ',')+1;
+        printf("longitude hemisphere: %s\n", p[0]);
+
+        /*switch (p[0]) {
+            case 'W':
+                loc->lon = 'W';
+                break;
+            case 'E':
+                loc->lon = 'E';
+                break;
+            case ',':
+                loc->lon = '\0';
+                break;
+        }*/
+        /*
+        p = strchr(p, ',')+1;
+        loc->quality = (uint8_t)atoi(p);
+
+        p = strchr(p, ',')+1;
+        loc->satellites = (uint8_t)atoi(p);
+
+        p = strchr(p, ',')+1;
+
+        p = strchr(p, ',')+1;
+        loc->altitude = atof(p);*/
+    }
+}
+
 void readGPS() {
     int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
@@ -382,6 +443,12 @@ void readGPS() {
     tcsetattr(serialPort, TCSANOW, &options);
 
     char read_buf [256];
+
+    char antennaCmd[] = "$CDCMD,33,1*7C"
+
+    printf("Resolution to 1mm\n");
+    write(serialPort, antennaCmd, sizeof(antennaCmd));  //Set resolution to 1mm
+    sleep(1);
 
     while(1) {
         char c;
@@ -547,6 +614,7 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
+    parseGPSMessage()
     printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
