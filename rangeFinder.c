@@ -379,8 +379,9 @@ void bno055() {
 
 void parseGPSMessage(char* message) {
     //char testMessage[256] = "$GPGGA,202530.00,5109.0262,N,11401.8407,W,5,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
-    printf("%s\n", message);
-    if (strstr(message, "$GPGGA") != NULL) {
+
+    if (strstr(message, "$GNGGA") != NULL) {
+        printf("%s\n", message);
         char *p = message;
         p = strchr(p, ',')+1; //skip time
 
@@ -433,7 +434,7 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        parseGPSMessage(read_buf); 
+        parseGPSMessage(read_buf);
         /////////////////////////////////////
     }
 }
