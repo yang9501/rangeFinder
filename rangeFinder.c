@@ -507,7 +507,7 @@ void printCalibrationDisplay() {
     println();
     print_strln(strcat(rangeFinderStatusBase, rangeFinderStatus));
     println();
-    print_strln(strcat(compassStatusBase, compassStatus));
+    //print_strln(strcat(compassStatusBase, compassStatus));
 
     Display();
 }
