@@ -312,19 +312,27 @@ void bno055() {
     char i2c_bus[256] = I2CBUS;
 
     get_i2cbus(i2c_bus, senaddr);
-    int res = set_mode(compass);
+    int res = set_mode(gyronly);
     if(res != 0) {
         printf("Error: could not set sensor mode \n");
         exit(-1);
     }
     getBno055Info();
     getCalStatus();
-    struct bnoeul bnod;
-    res = get_eul(&bnod);
-    printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
-    struct bnomag bnodMag;
-    res = get_mag(&bnodMag);
-    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+    struct bnogyr bnod;
+    res = get_gyr(&bnod);
+    if(res != 0) {
+        printf("Error: Cannot read gyroscope data.\n");
+        exit(-1);
+    }
+
+    printf("GYR %3.2f %3.2f %3.2f\n", bnod.gdata_x, bnod.gdata_y, bnod.gdata_z);
+    //struct bnoeul bnod;
+    //res = get_eul(&bnod);
+    //printf("EUL %3.4f %3.4f %3.4f\n", bnod.eul_head, bnod.eul_roll, bnod.eul_pitc);
+    //struct bnomag bnodMag;
+    //res = get_mag(&bnodMag);
+    //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 }
 
 
