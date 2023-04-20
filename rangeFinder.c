@@ -505,14 +505,12 @@ void printCalibrationDisplay() {
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1,0);
-    print_strln(strcat(gpsStatusBase, gpsStatus));
+    print_strln("deeplyembedded.org");
     println();
-    print_strln(strcat(rangeFinderStatusBase, rangeFinderStatus));
+    print_strln("Author:Vinay Divakar");
     println();
-    print_strln(strcat(compassStatusBase, compassStatus));
-    printf("hello\n");
-    Display();
-    printf("hi\n");
+    println();
+    print_strln("THANK YOU");
 }
 
 void getButtonPress(void *buttonPort) {
