@@ -428,7 +428,7 @@ void parseGPSMessage(char* message) {
         printf("TESTING LONG: %f\n", degreesToDecimal(10036.0022));
         //newCoords(degreesToDecimal(3887.94), degreesToDecimal(-77228.294), 0, -500);
 
-        newCoords(38.8794, -77.228294, 0, -500);
+        newCoords(38.8794, -77.228294, 500, -500);
     }
 }
 
