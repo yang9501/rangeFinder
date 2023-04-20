@@ -458,19 +458,17 @@ void rangeFinder() {
     char test_buf [256];
     printf("Beginning read\n");
     while(1) {
-        while(1) {
-            int n = read(serialPort, (void *) (&read_buf), 11);
+        int n = read(serialPort, (void *) (&read_buf), 11);
 
-            if (n < 0) {
-                printf("Unresponsive\n");
-            } else {
-                printf("Raw data: %s\n", read_buf);
-                strncpy(test_buf, read_buf + 3, 7);
-                /////////////TODO: MUTEX AND INFODUMP HERE
-                printf("Parsed: %s\n", test_buf);
-                fflush(stdout);
-                //////////////////////////////////
-            }
+        if (n < 0) {
+            printf("Unresponsive\n");
+        } else {
+            printf("Raw data: %s\n", read_buf);
+            strncpy(test_buf, read_buf + 3, 7);
+            /////////////TODO: MUTEX AND INFODUMP HERE
+            printf("Parsed: %s\n", test_buf);
+            fflush(stdout);
+            //////////////////////////////////
         }
     }
 }
@@ -487,13 +485,13 @@ void printCalibrationDisplay() {
         exit(1);
     }
 
-    char gpsStatusBase[] = "Calibrating";
-    char rangeFinderStatusBase[] = "Calibrating";
-    char compassStatusBase[] = "Calibrating";
+    char gpsStatusBase[] = "Cali";
+    char rangeFinderStatusBase[] = "Calib";
+    char compassStatusBase[] = "Cali";
 
     char gpsStatus[] = "Calibrating";
-    char rangeFinderStatus[] = "Calibrating";
-    char compassStatus[] = "Calibrating";
+    char rangeFinderStatus[] = "Cali";
+    char compassStatus[] = "Calib";
 
     display_Init_seq();
 
@@ -516,7 +514,7 @@ void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
-    //printCalibrationDisplay();
+    printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
