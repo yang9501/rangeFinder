@@ -206,13 +206,13 @@ void getCalStatus() {
      * -------------------------------------------------------- */
     while (1) {
         get_calstatus(&bnoc);
-        printf("sys [S:%d]", bnoc.scal_st);
         if(bnoc.scal_st == 3) {
             //////////TODO ADD MUTEX
             compassReadyFlag = 1;
             //////////TODO ADD MUTEX
             break;
         }
+        usleep(100000);
     }
 
 
