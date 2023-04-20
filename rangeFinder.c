@@ -353,6 +353,7 @@ void bno055() {
     getCalStatus();
     while(1) {
         print_calstat();
+        sleep(2);
     }
     /*
     int gyrCalReady = 0;
