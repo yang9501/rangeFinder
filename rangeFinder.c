@@ -110,9 +110,9 @@ int main(void) {
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //Thread
-    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     (void) pthread_join(thread1, NULL);
@@ -214,8 +214,59 @@ void getCalStatus() {
         }
         usleep(100000);
     }
+}
 
+void tiltCompensatedCompass() {
+    double thetaM;
+    double phiM;
+    double thetaFold = 0;
+    double thetaFnew;
+    double phiFold = 0;
+    double phiFnew;
 
+    double thetaG = 0;
+    double phiG = 0;
+
+    double theta;
+    double phi;
+
+    double thetaRad;
+    double phiRad;
+
+    double Xm;
+    double Ym;
+    double psi;
+
+    //Retrieve Accelerometer data
+    struct bnoacc bnodAcc;
+    res = get_acc(&bnodAcc);
+    printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
+
+    //Retrieve Gyroscope data
+    struct bnogyr bnodGyr;
+    res = get_gyr(&bnodGyr);
+    printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
+
+    //Retrieve Magnetometer data
+    struct bnomag bnodMag;
+    res = get_mag(&bnodMag);
+    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+
+    //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
+    thetaM = -atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)/2/M_PI*360;
+
+    //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
+    phiM = -atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)/2/M_PI*360;
+
+    //phiFnew=.95*phiFold+.05*phiM;
+    phiFnew = 0.95*phiFold + 0.05*phiM;
+
+    //thetaFnew=.95*thetaFold+.05*thetaM;
+    thetaFnew = 0.95*thetaFold + 0.05*thetaM;
+
+    //dt=(millis()-millisOld)/1000.;
+    //dt
+    
 }
 
 void bno055() {
