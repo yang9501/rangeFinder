@@ -208,7 +208,7 @@ void tiltCompensatedCompass() {
         //phiG=phiG-gyr.x()*dt;
         phiG = phiG - bnodGyr.gdata_x * dt;
 
-        //Converts to radians because math.h trigonometry functions wants radians.
+        //Converts degrees to radians because math.h trigonometry functions wants radians.
         //phiRad=phi/360*(2*3.14);
         phiRad = (phi/360)*(2*M_PI);
         //thetaRad=theta/360*(2*3.14);
@@ -221,9 +221,10 @@ void tiltCompensatedCompass() {
         Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
 
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
+        //Convert radians to degrees
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        psi = remainder((((atan2(Ym, Xm)/(2*M_PI))*360) + 360), 360);  //HEADING IN DEGREES
+        psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
         printf("DEGREES HEADING: %f\n", psi);
         //phiFold=phiFnew;
         phiFold = phiFnew;
