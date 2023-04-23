@@ -211,7 +211,8 @@ void tiltCompensatedCompass() {
         //Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
         Xm = bnodMag.mdata_x;
         Ym = bnodMag.mdata_y;
-
+        printf("Xm: %f\n", Xm);
+        printf("Ym: %f\n", Ym);
 
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
         //Convert radians to degrees
@@ -219,7 +220,7 @@ void tiltCompensatedCompass() {
         //conversion: angle = (angle + 360) % 360
         psi=atan2(Ym,Xm)/(2.*3.14)*360.;
         //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
-        printf("DEGREES HEADING: %f\n", psi);
+        //printf("DEGREES HEADING: %f\n", psi);
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
     }
