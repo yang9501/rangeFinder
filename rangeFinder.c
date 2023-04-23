@@ -179,17 +179,17 @@ void tiltCompensatedCompass() {
 
         //Measured values normalized
         //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
-        thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360)/(2*M_PI);
+        thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
         //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
-        phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360)/(2*M_PI);
+        phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
         //printf("thetaM HEADING: %f\n", thetaM);
         //printf("phiM HEADING: %f\n", phiM);
 
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
         gettimeofday(&time, NULL);
-        millisecondsCurr = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
-        dt = (millisecondsCurr - millisecondsOld)/1000;  //dt is in SECONDS
+        millisecondsCurr = ((double) time.tv_sec * 1000.) + ((double) time.tv_usec / 1000.);
+        dt = (millisecondsCurr - millisecondsOld)/1000.;  //dt is in SECONDS
         millisecondsOld = millisecondsCurr;
         //printf("Seconds elasped: %f\n", dt);
         //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
@@ -200,9 +200,9 @@ void tiltCompensatedCompass() {
         //printf("phi HEADING: %f\n", phi);
         //Converts degrees to radians because math.h trigonometry functions wants radians.
         //phiRad=phi/360*(2*3.14);
-        phiRad = (phi/360)*(2*M_PI);
+        phiRad = (phi/360.)*(2.*M_PI);
         //thetaRad=theta/360*(2*3.14);
-        thetaRad = (theta/360)*(2*M_PI);
+        thetaRad = (theta/360.)*(2.*M_PI);
 
         //Compensate accel/gyro tilt for magnetometer values
         //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
@@ -214,7 +214,7 @@ void tiltCompensatedCompass() {
         //Convert radians to degrees
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        psi=atan2(Ym,Xm)/(2*3.14)*360;
+        psi=atan2(Ym,Xm)/(2.*3.14)*360.;
         //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
         printf("DEGREES HEADING: %f\n", psi);
 
