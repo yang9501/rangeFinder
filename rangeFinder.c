@@ -186,6 +186,7 @@ void tiltCompensatedCompass() {
         gettimeofday(&time, NULL);
         dt = (((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000) - millisecondsOld)/1000;
         millisecondsOld = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
+        printf("Milliseconds: %f\n", dt);
         //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
