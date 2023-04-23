@@ -191,13 +191,13 @@ void tiltCompensatedCompass() {
         millisecondsCurr = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
         dt = (millisecondsCurr - millisecondsOld)/1000;  //dt is in SECONDS
         millisecondsOld = millisecondsCurr;
-        printf("Seconds elasped: %f\n", dt);
+        //printf("Seconds elasped: %f\n", dt);
         //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
         phi=(phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
-        printf("theta HEADING: %f\n", theta);
-        printf("phi HEADING: %f\n", phi);
+        //printf("theta HEADING: %f\n", theta);
+        //printf("phi HEADING: %f\n", phi);
         //Converts degrees to radians because math.h trigonometry functions wants radians.
         //phiRad=phi/360*(2*3.14);
         phiRad = (phi/360)*(2*M_PI);
@@ -216,7 +216,7 @@ void tiltCompensatedCompass() {
         //conversion: angle = (angle + 360) % 360
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
         psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
-        //printf("DEGREES HEADING: %f\n", psi);
+        printf("DEGREES HEADING: %f\n", psi);
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
     }
