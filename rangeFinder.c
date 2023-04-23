@@ -220,7 +220,7 @@ void tiltCompensatedCompass() {
         //conversion: angle = (angle + 360) % 360
         psi = (atan2(Ym,Xm)/(2.*M_PI))*360.;
         //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
-        //printf("DEGREES HEADING: %f\n", psi);
+        printf("DEGREES HEADING: %f\n", psi);
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
     }
