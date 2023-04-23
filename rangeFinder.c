@@ -142,6 +142,8 @@ void getCalStatus() {
 
 void tiltCompensatedCompass() {
     //https://toptechboy.com/9-axis-imu-lesson-10-making-a-tilt-compensated-compass-with-arduino/
+    int res = 0;
+
     double thetaM;  //Measured
     double phiM;
     double thetaFold = 0;  //F for filtered
