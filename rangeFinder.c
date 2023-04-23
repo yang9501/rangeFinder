@@ -165,22 +165,24 @@ void tiltCompensatedCompass() {
         //Retrieve Accelerometer data
         struct bnoacc bnodAcc;
         res = get_acc(&bnodAcc);
-        printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
+        //printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
         //Retrieve Gyroscope data
         struct bnogyr bnodGyr;
         res = get_gyr(&bnodGyr);
-        printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
+        //printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
         //Retrieve Magnetometer data
         struct bnomag bnodMag;
         res = get_mag(&bnodMag);
-        printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+        //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 
         //Measured values normalized
         //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360)/(2*M_PI);
         //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360)/(2*M_PI);
-
+        printf("thetaM HEADING: %f\n", thetaM);
+        printf("phiM HEADING: %f\n", phiM);
+        
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
         gettimeofday(&time, NULL);
@@ -210,7 +212,7 @@ void tiltCompensatedCompass() {
         //conversion: angle = (angle + 360) % 360
         psi=atan2(Ym,Xm)/(2*3.14)*360;
         //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
-        printf("DEGREES HEADING: %f\n", psi);
+        //printf("DEGREES HEADING: %f\n", psi);
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
     }
