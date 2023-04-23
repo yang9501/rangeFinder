@@ -29,17 +29,19 @@ static uint32_t readGPIO(char *filename, char *port);
 
 //Primary button press detection
 void getButtonPress(void *buttonPort);
-void print_calstat();
-void bno055();
 void printCalibrationDisplay();
+
 double degreesToDecimal(double degreeCoord);
 double newCoords(double initLat, double initLong, double dx, double dy);
 void latLongDegToDecimal();
 void parseGPSMessage(char* message);
 void readGPS();
+
 void rangeFinder();
-void getBno055Info();
+
 void getCalStatus();
+void bno055();
+void tiltCompensatedCompass();
 
 ///////DATA VARIABLES
 int gpsReadyFlag = 0;
@@ -109,94 +111,15 @@ int main(void) {
 
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
-    //Thread
-    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    //IMU Thread
+    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
-    (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
+    //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
-}
-
-void print_calstat() {
-    struct bnocal bnoc;
-    /* -------------------------------------------------------- *
-     *  Check the sensors calibration state                     *
-     * -------------------------------------------------------- */
-    int res = get_calstatus(&bnoc);
-    if(res != 0) {
-        printf("Error: Cannot read calibration state.\n");
-        exit(-1);
-    }
-
-    /* -------------------------------------------------------- *
-     *  Convert the status code into a status message           *
-     * -------------------------------------------------------- */
-    printf("Sensor System Calibration = ");
-    switch(bnoc.scal_st) {
-        case 0:
-            printf("Uncalibrated\n");
-            break;
-        case 1:
-            printf("Minimal Calibrated\n");
-            break;
-        case 2:
-            printf("Mostly Calibrated\n");
-            break;
-        case 3:
-            printf("Fully calibrated\n");
-            break;
-    }
-
-    printf("    Gyroscope Calibration = ");
-    switch(bnoc.gcal_st) {
-        case 0:
-            printf("Uncalibrated\n");
-            break;
-        case 1:
-            printf("Minimal Calibrated\n");
-            break;
-        case 2:
-            printf("Mostly Calibrated\n");
-            break;
-        case 3:
-            printf("Fully calibrated\n");
-            break;
-    }
-
-    printf("Accelerometer Calibration = ");
-    switch(bnoc.acal_st) {
-        case 0:
-            printf("Uncalibrated\n");
-            break;
-        case 1:
-            printf("Minimal Calibrated\n");
-            break;
-        case 2:
-            printf("Mostly Calibrated\n");
-            break;
-        case 3:
-            printf("Fully calibrated\n");
-            break;
-    }
-
-    printf(" Magnetometer Calibration = ");
-    switch(bnoc.mcal_st) {
-        case 0:
-            printf("Uncalibrated\n");
-            break;
-        case 1:
-            printf("Minimal Calibrated\n");
-            break;
-        case 2:
-            printf("Mostly Calibrated\n");
-            break;
-        case 3:
-            printf("Fully calibrated\n");
-            break;
-    }
 }
 
 void getCalStatus() {
@@ -217,9 +140,10 @@ void getCalStatus() {
 }
 
 void tiltCompensatedCompass() {
-    double thetaM;
+    //https://toptechboy.com/9-axis-imu-lesson-10-making-a-tilt-compensated-compass-with-arduino/
+    double thetaM;  //Measured
     double phiM;
-    double thetaFold = 0;
+    double thetaFold = 0;  //F for filtered
     double thetaFnew;
     double phiFold = 0;
     double phiFnew;
@@ -227,46 +151,83 @@ void tiltCompensatedCompass() {
     double thetaG = 0;
     double phiG = 0;
 
-    double theta;
-    double phi;
+    double theta; //pitch
+    double phi;  //roll
 
     double thetaRad;
     double phiRad;
 
     double Xm;
     double Ym;
-    double psi;
+    double psi; //heading angle
 
-    //Retrieve Accelerometer data
-    struct bnoacc bnodAcc;
-    res = get_acc(&bnodAcc);
-    printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
+    double millisecondsOld = 0;
+    struct timeval time;
 
-    //Retrieve Gyroscope data
-    struct bnogyr bnodGyr;
-    res = get_gyr(&bnodGyr);
-    printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
+    while(1) {
+        //Retrieve Accelerometer data
+        struct bnoacc bnodAcc;
+        res = get_acc(&bnodAcc);
+        printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
+        //Retrieve Gyroscope data
+        struct bnogyr bnodGyr;
+        res = get_gyr(&bnodGyr);
+        printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
+        //Retrieve Magnetometer data
+        struct bnomag bnodMag;
+        res = get_mag(&bnodMag);
+        printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 
-    //Retrieve Magnetometer data
-    struct bnomag bnodMag;
-    res = get_mag(&bnodMag);
-    printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+        //Low pass filter values for accelerometer
+        //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
+        thetaM = -atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)/2/M_PI*360;
+        //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
+        phiM = -atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)/2/M_PI*360;
+        //phiFnew=.95*phiFold+.05*phiM;
+        phiFnew = 0.95*phiFold + 0.05*phiM;
+        //thetaFnew=.95*thetaFold+.05*thetaM;
+        thetaFnew = 0.95*thetaFold + 0.05*thetaM;
 
-    //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
-    thetaM = -atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)/2/M_PI*360;
+        //Low pass filter values for Gyroscope
+        //dt=(millis()-millisOld)/1000.;
+        gettimeofday(&time, NULL);
+        dt = (((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000) - millisecondsOld)/1000;
+        millisecondsOld = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
+        //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
+        theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
+        //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
+        phi=(phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
 
-    //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
-    phiM = -atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)/2/M_PI*360;
+        //The thetaG and phiG aren't used?
+        //thetaG=thetaG+gyr.y()*dt;
+        thetaG = thetaG + bnodGyr.gdata_y * dt;
+        //phiG=phiG-gyr.x()*dt;
+        phiG = phiG - bnodGyr.gdata_x * dt;
 
-    //phiFnew=.95*phiFold+.05*phiM;
-    phiFnew = 0.95*phiFold + 0.05*phiM;
+        //Converts to radians because math.h trigonometry functions wants radians.
+        //phiRad=phi/360*(2*3.14);
+        phiRad = (phi/360)*(2*M_PI);
+        //thetaRad=theta/360*(2*3.14);
+        thetaRad = (theta/360)*(2*M_PI));
 
-    //thetaFnew=.95*thetaFold+.05*thetaM;
-    thetaFnew = 0.95*thetaFold + 0.05*thetaM;
+        //Compensate accel/gyro tilt for magnetometer values
+        //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
+        Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
+        //Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);
+        Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
 
-    //dt=(millis()-millisOld)/1000.;
-    //dt
-    
+        //psi=atan2(Ym,Xm)/(2*3.14)*360;
+        //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
+        //conversion: angle = (angle + 360) % 360
+        psi = (atan2(Ym, Xm)/(2*M_PI))*360;  //HEADING IN DEGREES
+
+        //phiFold=phiFnew;
+        phiFold = phiFnew;
+        //thetaFold=thetaFnew;
+        thetaFold=thetaFnew;
+
+        usleep(10 * 1000); //Sleep for 10 milliseconds
+    }
 }
 
 void bno055() {
@@ -282,19 +243,10 @@ void bno055() {
     }
 
     ////////CALIBRATION STATUS
-    /* -------------------------------------------------------- *
-     *  Read the sensors calibration state                      *
-     * -------------------------------------------------------- */
-
-    //getBno055Info();
     getCalStatus();
 
-    while(1) {
-        struct bnoeul bnodEul;
-        res = get_eul(&bnodEul);
-        printf("EUL %3.4f %3.4f %3.4f\n", bnodEul.eul_head, bnodEul.eul_roll, bnodEul.eul_pitc);
-        usleep(1000000);
-    }
+    ////////MAIN LOGIC
+    tiltCompensatedCompass();
 }
 
 double newCoords(double initLat, double initLong, double dx, double dy) {
@@ -602,95 +554,4 @@ static void writeGPIO(char *filename, char *port, char *value) {
     fp = fopen(fullFileName, "w+"); //open file for writing
     (void) fprintf(fp, "%s", value); // send value to the file
     (void) fclose(fp); //close the file using the file pointer
-}
-
-
-void getBno055Info() {
-    struct bnoinf bnoi;
-    int res = get_inf(&bnoi);
-    /* ----------------------------------------------------------- *
-       * print the formatted output strings to stdout                *
-       * ----------------------------------------------------------- */
-    printf("\nBN0055 Information");
-    printf("----------------------------------------------\n");
-    printf("   Chip Version ID = 0x%02X\n", bnoi.chip_id);
-    printf("  Accelerometer ID = 0x%02X\n", bnoi.acc_id);
-    printf("      Gyroscope ID = 0x%02X\n", bnoi.gyr_id);
-    printf("   Magnetoscope ID = 0x%02X\n", bnoi.mag_id);
-    printf("  Software Version = %d.%d\n", bnoi.sw_msb, bnoi.sw_lsb);
-    printf("   Operations Mode = "); print_mode(bnoi.opr_mode);
-    printf("        Power Mode = "); print_power(bnoi.pwr_mode);
-    printf("Axis Configuration = "); print_remap_conf(bnoi.axr_conf);
-    printf("   Axis Remap Sign = "); print_remap_sign(bnoi.axr_sign);
-    printf("System Status Code = "); print_sstat(bnoi.sys_stat);
-    printf("System Clocksource = "); print_clksrc();
-
-    printf("Accelerometer Test = ");
-    if((bnoi.selftest >> 0) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf(" Magnetometer Test = ");
-    if((bnoi.selftest >> 1) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf("    Gyroscope Test = ");
-    if((bnoi.selftest >> 2) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf("MCU Cortex M0 Test = ");
-    if((bnoi.selftest >> 3) & 0x01) printf("OK\n");
-    else printf("FAIL\n");
-
-    printf(" System Error Code = ");
-    switch(bnoi.sys_err) {
-        case 0x00:
-            printf("No Error\n");
-            break;
-        case 0x01:
-            printf("Peripheral initialization error\n");
-            break;
-        case 0x02:
-            printf("System initializion error\n");
-            break;
-        case 0x03:
-            printf("Selftest result failed\n");
-            break;
-        case 0x04:
-            printf("Register map value out of range\n");
-            break;
-        case 0x05:
-            printf("Register map address out of range\n");
-            break;
-        case 0x06:
-            printf("Register map write error\n");
-            break;
-        case 0x07:
-            printf("BNO low power mode not available\n");
-            break;
-        case 0x08:
-            printf("Accelerometer power mode not available\n");
-            break;
-        case 0x09:
-            printf("Fusion algorithm configuration error\n");
-            break;
-        case 0x0A:
-            printf("Sensor configuration error\n");
-            break;
-    }
-
-    print_unit(bnoi.unitsel);
-
-    printf("Sensor Temperature = ");
-    if(bnoi.opr_mode > 0) {
-        if((bnoi.unitsel >> 4) & 0x01) printf("%d°F\n", bnoi.temp_val);
-        else printf("%d°C\n",bnoi.temp_val);
-    }
-    else  printf("no data in CONFIG mode\n");
-
-    printf("\n----------------------------------------------\n");
-    struct bnoaconf bnoac;
-    if(get_acc_conf(&bnoac) == 0) print_acc_conf(&bnoac);
-
-    printf("\n----------------------------------------------\n");
-    print_calstat();
 }
