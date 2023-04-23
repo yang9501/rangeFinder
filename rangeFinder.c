@@ -172,15 +172,15 @@ void tiltCompensatedCompass() {
         //Retrieve Accelerometer data
         struct bnoacc bnodAcc;
         res = get_acc(&bnodAcc);
-        //printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
+        printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
         //Retrieve Gyroscope data
         struct bnogyr bnodGyr;
         res = get_gyr(&bnodGyr);
-        //printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
+        printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
         //Retrieve Magnetometer data
         struct bnomag bnodMag;
         res = get_mag(&bnodMag);
-        //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
+        printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 
         //Low pass filter values for accelerometer
         //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
