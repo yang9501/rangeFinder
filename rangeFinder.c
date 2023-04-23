@@ -180,9 +180,9 @@ void tiltCompensatedCompass() {
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360)/(2*M_PI);
         //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360)/(2*M_PI);
-        printf("thetaM HEADING: %f\n", thetaM);
-        printf("phiM HEADING: %f\n", phiM);
-        
+        //printf("thetaM HEADING: %f\n", thetaM);
+        //printf("phiM HEADING: %f\n", phiM);
+
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
         gettimeofday(&time, NULL);
@@ -193,7 +193,8 @@ void tiltCompensatedCompass() {
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
         phi=(phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
-
+        printf("theta HEADING: %f\n", theta);
+        printf("phi HEADING: %f\n", phi);
         //Converts degrees to radians because math.h trigonometry functions wants radians.
         //phiRad=phi/360*(2*3.14);
         phiRad = (phi/360)*(2*M_PI);
