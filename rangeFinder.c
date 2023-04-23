@@ -211,8 +211,8 @@ void tiltCompensatedCompass() {
         Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
         //Xm = bnodMag.mdata_x;
         //Ym = bnodMag.mdata_y;
-        //printf("Xm: %f\n", Xm);
-        //printf("Ym: %f\n", Ym);
+        printf("Xm: %f\n", Xm);
+        printf("Ym: %f\n", Ym);
 
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
         //Convert radians to degrees
