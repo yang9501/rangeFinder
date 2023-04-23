@@ -146,13 +146,6 @@ void tiltCompensatedCompass() {
 
     double thetaM;  //Measured
     double phiM;
-    double thetaFold = 0;  //F for filtered
-    double thetaFnew;
-    double phiFold = 0;
-    double phiFnew;
-
-    double thetaG = 0;
-    double phiG = 0;
 
     double theta; //pitch
     double phi;  //roll
@@ -187,10 +180,6 @@ void tiltCompensatedCompass() {
         thetaM = -atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)/2/M_PI*360;
         //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
         phiM = -atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)/2/M_PI*360;
-        //phiFnew=.95*phiFold+.05*phiM;
-        phiFnew = 0.95*phiFold + 0.05*phiM;
-        //thetaFnew=.95*thetaFold+.05*thetaM;
-        thetaFnew = 0.95*thetaFold + 0.05*thetaM;
 
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
@@ -201,12 +190,6 @@ void tiltCompensatedCompass() {
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
         phi=(phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
-
-        //The thetaG and phiG aren't used?
-        //thetaG=thetaG+gyr.y()*dt;
-        thetaG = thetaG + bnodGyr.gdata_y * dt;
-        //phiG=phiG-gyr.x()*dt;
-        phiG = phiG - bnodGyr.gdata_x * dt;
 
         //Converts degrees to radians because math.h trigonometry functions wants radians.
         //phiRad=phi/360*(2*3.14);
@@ -224,12 +207,9 @@ void tiltCompensatedCompass() {
         //Convert radians to degrees
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
+        psi=atan2(Ym,Xm)/(2*3.14)*360;
+        //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
         printf("DEGREES HEADING: %f\n", psi);
-        //phiFold=phiFnew;
-        phiFold = phiFnew;
-        //thetaFold=thetaFnew;
-        thetaFold=thetaFnew;
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
     }
