@@ -7,6 +7,7 @@
 #include <sys/utsname.h>
 #include <stdint.h>
 #include <time.h>
+#include <sys/time.h>
 #include <float.h>
 #include <sched.h>
 #include <errno.h>
@@ -161,6 +162,7 @@ void tiltCompensatedCompass() {
     double Ym;
     double psi; //heading angle
 
+    double dt = 0;
     double millisecondsOld = 0;
     struct timeval time;
 
@@ -208,7 +210,7 @@ void tiltCompensatedCompass() {
         //phiRad=phi/360*(2*3.14);
         phiRad = (phi/360)*(2*M_PI);
         //thetaRad=theta/360*(2*3.14);
-        thetaRad = (theta/360)*(2*M_PI));
+        thetaRad = (theta/360)*(2*M_PI);
 
         //Compensate accel/gyro tilt for magnetometer values
         //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
