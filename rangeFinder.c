@@ -195,7 +195,7 @@ void tiltCompensatedCompass() {
         //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
-        phi=(phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
+        phi = (phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
         //printf("theta HEADING: %f\n", theta);
         //printf("phi HEADING: %f\n", phi);
         //Converts degrees to radians because math.h trigonometry functions wants radians.
@@ -206,9 +206,12 @@ void tiltCompensatedCompass() {
 
         //Compensate accel/gyro tilt for magnetometer values
         //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
-        Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
+        //Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
         //Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);
-        Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
+        //Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
+        Xm = bnodMag.mdata_x;
+        Ym = bnodMag.mdata_y;
+
 
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
         //Convert radians to degrees
