@@ -175,11 +175,11 @@ void tiltCompensatedCompass() {
         res = get_mag(&bnodMag);
         printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 
-        //Low pass filter values for accelerometer
+        //Measured values normalized
         //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
-        thetaM = -atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)/2/M_PI*360;
+        thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360)/(2*M_PI);
         //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
-        phiM = -atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)/2/M_PI*360;
+        phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360)/(2*M_PI);
 
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
