@@ -206,19 +206,19 @@ void tiltCompensatedCompass() {
 
         //Compensate accel/gyro tilt for magnetometer values
         //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
-        //Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
+        Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
         //Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);
-        //Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
-        Xm = bnodMag.mdata_x;
-        Ym = bnodMag.mdata_y;
-        printf("Xm: %f\n", Xm);
-        printf("Ym: %f\n", Ym);
+        Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
+        //Xm = bnodMag.mdata_x;
+        //Ym = bnodMag.mdata_y;
+        //printf("Xm: %f\n", Xm);
+        //printf("Ym: %f\n", Ym);
 
         //psi=atan2(Ym,Xm)/(2*3.14)*360;
         //Convert radians to degrees
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        psi=atan2(Ym,Xm)/(2.*3.14)*360.;
+        psi = (atan2(Ym,Xm)/(2.*M_PI))*360.;
         //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
         //printf("DEGREES HEADING: %f\n", psi);
 
