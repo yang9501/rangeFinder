@@ -158,8 +158,10 @@ void tiltCompensatedCompass() {
     double psi; //heading angle
 
     double dt = 0;
-    double millisecondsOld = 0;
     struct timeval time;
+    gettimeofday(&time, NULL);
+    double millisecondsOld = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
+    double millisecondsCurr = 0;
 
     while(1) {
         //Retrieve Accelerometer data
@@ -186,9 +188,10 @@ void tiltCompensatedCompass() {
         //Low pass filter values for Gyroscope
         //dt=(millis()-millisOld)/1000.;
         gettimeofday(&time, NULL);
-        dt = (((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000) - millisecondsOld)/1000;
-        millisecondsOld = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
-        printf("Milliseconds: %f\n", dt);
+        millisecondsCurr = ((double) time.tv_sec * 1000) + ((double) time.tv_usec / 1000);
+        dt = millisecondsCurr - millisecondsOld;
+        millisecondsOld = millisecondsCurr;
+        printf("Milliseconds elasped: %f\n", dt);
         //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
@@ -211,8 +214,8 @@ void tiltCompensatedCompass() {
         //Convert radians to degrees
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        psi=atan2(Ym,Xm)/(2*3.14)*360;
-        //psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
+        //psi=atan2(Ym,Xm)/(2*3.14)*360;
+        psi = remainder(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
         //printf("DEGREES HEADING: %f\n", psi);
 
         usleep(1000 * 1000); //Sleep for 10 milliseconds
