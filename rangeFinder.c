@@ -504,8 +504,8 @@ void printCalibrationDisplay() {
 }
 
 void polarToCartesianCoords(double r, double theta, double* x, double* y) {
-    *x = r * cos(theta);
-    *y = r * sin(theta);
+    *y = r * cos(theta);
+    *x = r * sin(theta);
 }
 
 double newCoords(double initLat, double initLong, double dx, double dy) {
