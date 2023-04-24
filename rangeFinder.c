@@ -4,21 +4,14 @@
 #include <fcntl.h>
 #include <string.h>
 #include <pthread.h>
-#include <sys/utsname.h>
 #include <stdint.h>
 #include <time.h>
 #include <sys/time.h>
-#include <float.h>
-#include <sched.h>
-#include <errno.h>
 #include <termios.h>
-#include <sys/types.h>
 #include <math.h>
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/SSD1306_OLED_Library/SSD1306_OLED.h"
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/I2C_Library/I2C.h"
 #include "pi-bno055-master/getbno055.h"
-//comment out to live run
-//#define DEBUG 1
 
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
 
@@ -30,16 +23,18 @@ static uint32_t readGPIO(char *filename, char *port);
 
 //Primary button press detection
 void getButtonPress(void *buttonPort);
+
 void printCalibrationDisplay();
 
+//GPS functions
 double degreesToDecimal(double degreeCoord);
 double newCoords(double initLat, double initLong, double dx, double dy);
 void latLongDegToDecimal();
 void parseGPSMessage(char* message);
 void readGPS();
-
+//Rangefinder function
 void rangeFinder();
-
+//Compass functions
 void getCalStatus();
 void polarToCartesianCoords(double r, double theta, double* x, double* y);
 void bno055();
@@ -62,33 +57,24 @@ double targetLatitude = 0.0;
 double targetLongitude = 0.0;
 
 //Mutexes
-pthread_mutex_t timerMutex;
-float timerInMilliseconds;
-
-pthread_mutex_t runningStateMutex;
-int watchRunningState;
+pthread_mutex_t gpsMutex;
+pthread_mutex_t rangefinderMutex;
+pthread_mutex_t compassMutex;
+pthread_mutex_t targetLocMutex;
 
 int main(void) {
-    //arrays containing GPIO port definitions, representing the green and red lights, and the start/stop and reset buttons
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
 
-    #ifdef DEBUG
-    (void) printf("DEBUG MODE\n");
-    struct utsname sysInfo;
-    (void) uname(&sysInfo);
-    (void) printf("%s\n", sysInfo.sysname);
-    (void) printf("%s\n", sysInfo.nodename);
-    (void) printf("%s\n", sysInfo.machine);
-    #else
     (void) writeGPIO("/direction", buttonPort, "in");
-    #endif
 
     //Initialize mutexes
-    (void) pthread_mutex_init(&runningStateMutex, NULL);
-    (void) pthread_mutex_init(&timerMutex, NULL);
+    (void) pthread_mutex_init(&gpsMutex, NULL);
+    (void) pthread_mutex_init(&rangefinderMutex, NULL);
+    (void) pthread_mutex_init(&compassMutex, NULL);
+    (void) pthread_mutex_init(&targetLocMutex, NULL);
 
     // Create independent threads each of which will execute function
-    pthread_t thread1, thread2, thread3, thread4, thread5;
+    pthread_t thread1, thread2, thread3, thread4;
     pthread_attr_t tattr1, tattr2, tattr3, tattr4;
     struct sched_param param1, param2, param3, param4;
 
@@ -116,12 +102,14 @@ int main(void) {
 
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
-    //IMU Thread
+    //Compass Thread
     (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
     (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
     (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
+
+    //Wait on button thread
     (void) pthread_join(thread1, NULL);
 
 	return 0;
@@ -129,15 +117,11 @@ int main(void) {
 
 void getCalStatus() {
     struct bnocal bnoc;
-    /* -------------------------------------------------------- *
-     *  Read the sensors calibration state                      *
-     * -------------------------------------------------------- */
+    ////////////READ IMU SYSTEM CALIBRATION STATUS
     while (1) {
         get_calstatus(&bnoc);
         if(bnoc.scal_st == 3) {
-            //////////TODO ADD MUTEX
             compassReadyFlag = 1;
-            //////////TODO ADD MUTEX
             break;
         }
         usleep(100000);
@@ -182,12 +166,12 @@ void tiltCompensatedCompass() {
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
 
-        //Low pass filter values for Gyroscope
+
         gettimeofday(&time, NULL);
         millisecondsCurr = ((double) time.tv_sec * 1000.) + ((double) time.tv_usec / 1000.);
         dt = (millisecondsCurr - millisecondsOld)/1000.;  //dt is in SECONDS
         millisecondsOld = millisecondsCurr;
-
+        //Low pass filter values for Gyroscope
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
         phi = (phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
 
@@ -198,7 +182,6 @@ void tiltCompensatedCompass() {
         //Compensate accel/gyro tilt for magnetometer values
         Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
         Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
-
 
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
@@ -244,37 +227,33 @@ void parseGPSMessage(char* message) {
         char *ns;
         double longRawValue = 0.0;
         char *ew;
-        //printf("%s\n", message);
-        char *p = message;
-        p = strchr(p, ',')+1; //skip time
 
+        char *p = message;
+        p = strchr(p, ',')+1; //skip time value in GPS message
+
+        //Latitude value
         p = strchr(p, ',')+1;
         latRawValue = atof(p);
-        //printf("latitude: %f\n", atof(p));
 
+        //Latitude hemisphere
         p = strchr(p, ',')+1;
         ns = &p[0];
-        //printf("latitude hemisphere: %c\n", p[0]);
 
+        //Longitude value
         p = strchr(p, ',')+1;
         longRawValue = atof(p);
-        //printf("longitude: %f\n", atof(p));
 
+        //Longitude Hemisphere
         p = strchr(p, ',')+1;
         ew = &p[0];
-        //printf("longitude hemisphere: %c\n", p[0]);
 
         double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
         double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
         //////////TODO: ADD MUTEX HERE
-        //printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
-        //printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
         latitude = degreesToDecimal(latDegrees);
         longitude = degreesToDecimal(longDegrees);
         ///////////////////////////////
-        //newCoords(degreesToDecimal(latitude), degreesToDecimal(longitude), 0, -500);
-        //GOOGLE MAPS TESTING newCoords(38.8794, -77.228294, 500, -500);
     }
 }
 
@@ -291,11 +270,7 @@ void readGPS() {
 
     char read_buf [256];
 
-    char antennaCmd[] = "$CDCMD,33,1*7C";
-
-    write(serialPort, antennaCmd, sizeof(antennaCmd));
-    sleep(1);
-
+    //////////READ FROM GPS UART SERIAL PORT
     while(1) {
         char c;
         char *b = read_buf;
@@ -311,11 +286,13 @@ void readGPS() {
                 *b++ = c;
             }
         }
-        /////////////TODO: MUTEX AND INFODUMP HERE
+        /////////////TEST DATA
         strcpy(read_buf, "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61");
-        //Apartment coords: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
+        //////////////////////
+        //Test coord origin: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
         char *p = read_buf;
-        p = strchr(p, ',')+6; //skip to GPS Fix Quality Indicator
+        p = strchr(p, ',')+6;
+        //GPS readiness status check.  Skip to GPS Fix Quality Indicator, which is greater than zero when GPS fix is obtained
         if(p[0] > 0) {
             gpsReadyFlag = 1;
         }
@@ -323,7 +300,6 @@ void readGPS() {
             continue;
         }
         parseGPSMessage(read_buf);
-        /////////////////////////////////////
     }
 }
 
@@ -384,9 +360,7 @@ void rangeFinder() {
     char read_buf [256];
     char test_buf [256];
 
-    ////////TODO ADD MUTEX HERE
     rangeFinderReadyFlag = 1;
-    ////////TODO ADD MUTEX HERE
 
     printf("Beginning read\n");
     while(1) {
@@ -431,7 +405,6 @@ void printCalibrationDisplay() {
         setTextColor(WHITE);
         setCursor(1, 0);
 
-        /////////TODO ADD MUTEXES HERE
         print_strln(gpsStatus);
         if (gpsReadyFlag == 0) {
             print_strln(calibratingStatus);
@@ -458,7 +431,6 @@ void printCalibrationDisplay() {
             sleep(2);
             break;
         }
-        /////////TODO ADD MUTEXES HERE
         sleep(1);
     }
     clearDisplay();
@@ -488,9 +460,10 @@ double newCoords(double initLat, double initLong, double dx, double dy) {
     double earthRadiusMeters = 6378 * 1000;
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
-
+    //////////////TODO MUTEXES HERE
     targetLatitude = newLat;
     targetLongitude = newLong;
+    ////////////////////////////////
 }
 
 void getButtonPress(void *buttonPort) {
@@ -508,7 +481,7 @@ void getButtonPress(void *buttonPort) {
             //first press detected
             if(pressedFlag == 0) {
                 pressedFlag = 1;
-
+                ////////////////////////////TODO MUTEXES HERE
                 printf("LATITUDE: %f\n", latitude);
                 printf("LONGITUDE: %f\n", longitude);
                 printf("RANGE %f\n", range);
@@ -518,6 +491,7 @@ void getButtonPress(void *buttonPort) {
                 newCoords(latitude, longitude, dx, dy);
                 sprintf(latStr, "%f", targetLatitude);
                 sprintf(longStr, "%f", targetLongitude);
+                ////////////////////////////////////////////////////////
                 clearDisplay();
                 setTextSize(1);
                 setTextColor(WHITE);
