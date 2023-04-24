@@ -505,7 +505,7 @@ void printCalibrationDisplay() {
 
 void polarToCartesianCoords(double r, double theta, double* x, double* y) {
     //double adjTheta = fmod(theta + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter clockwise
-    double thetaRadians = (theta*2*M_PI)/360 //Need to convert to radians because cos() and sin() expect as such
+    double thetaRadians = (theta*2*M_PI)/360; //Need to convert to radians because cos() and sin() expect as such
     printf("range is: %f\n", r);
     printf("heading is: %f\n", theta);
     printf("dx is: %f\n", r * cos(thetaRadians));
