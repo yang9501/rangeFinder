@@ -17,15 +17,11 @@
 
 //Writes specified value to specified GPIO directory
 static void writeGPIO(char *filename, char *port, char *value);
-
 //Reads input to GPIO pin
 static uint32_t readGPIO(char *filename, char *port);
-
 //Primary button press detection
 void getButtonPress(void *buttonPort);
-
 void printCalibrationDisplay();
-
 //GPS functions
 double degreesToDecimal(double degreeCoord);
 double newCoords(double initLat, double initLong, double dx, double dy);
@@ -165,8 +161,7 @@ void tiltCompensatedCompass() {
         //Measured values normalized
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
-
-
+        
         gettimeofday(&time, NULL);
         millisecondsCurr = ((double) time.tv_sec * 1000.) + ((double) time.tv_usec / 1000.);
         dt = (millisecondsCurr - millisecondsOld)/1000.;  //dt is in SECONDS
@@ -186,9 +181,11 @@ void tiltCompensatedCompass() {
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
         psi = fmod(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES CONVERTED FROM RADIANS
-        ////////////TODO MUTEX HERE
+
+        (void) pthread_mutex_lock(&compassMutex);
         heading = psi;
-        //////////////////////////
+        (void) pthread_mutex_unlock(&compassMutex);
+
         usleep(10 * 1000); //Sleep for 10 milliseconds
     }
 }
@@ -250,10 +247,10 @@ void parseGPSMessage(char* message) {
         double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
         double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
-        //////////TODO: ADD MUTEX HERE
+        (void) pthread_mutex_lock(&gpsMutex);
         latitude = degreesToDecimal(latDegrees);
         longitude = degreesToDecimal(longDegrees);
-        ///////////////////////////////
+        (void) pthread_mutex_unlock(&gpsMutex);
     }
 }
 
@@ -325,7 +322,6 @@ void rangeFinder() {
 
 
     ////////////SETUP
-    int continuousMeasurementMode = 1;
     int serialPort = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(serialPort, &options);
@@ -370,10 +366,11 @@ void rangeFinder() {
             printf("Unresponsive\n");
         } else {
             strncpy(test_buf, read_buf + 3, 7);
-            /////////////TODO: MUTEX AND INFODUMP HERE
+
+            (void) pthread_mutex_lock(&rangefinderMutex);
             //range = strtod(test_buf, NULL);
             range = 500;
-            //////////////////////////////////
+            (void) pthread_mutex_unlock(&rangefinderMutex);
         }
     }
 }
@@ -434,7 +431,6 @@ void printCalibrationDisplay() {
         sleep(1);
     }
     clearDisplay();
-
     setTextSize(1);
     setTextColor(WHITE);
     setCursor(1, 0);
@@ -460,10 +456,11 @@ double newCoords(double initLat, double initLong, double dx, double dy) {
     double earthRadiusMeters = 6378 * 1000;
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
-    //////////////TODO MUTEXES HERE
+
+    (void) pthread_mutex_lock(&targetLocMutex);
     targetLatitude = newLat;
     targetLongitude = newLong;
-    ////////////////////////////////
+    (void) pthread_mutex_unlock(&targetLocMutex);
 }
 
 void getButtonPress(void *buttonPort) {
@@ -481,17 +478,25 @@ void getButtonPress(void *buttonPort) {
             //first press detected
             if(pressedFlag == 0) {
                 pressedFlag = 1;
-                ////////////////////////////TODO MUTEXES HERE
+
                 printf("LATITUDE: %f\n", latitude);
                 printf("LONGITUDE: %f\n", longitude);
                 printf("RANGE %f\n", range);
                 printf("COMPASS: %f\n", heading);
 
+                (void) pthread_mutex_lock(&rangefinderMutex);
+                (void) pthread_mutex_lock(&compassMutex);
                 polarToCartesianCoords(range, heading, &dx, &dy);
+                (void) pthread_mutex_unlock(&rangefinderMutex);
+                (void) pthread_mutex_unlock(&compassMutex);
+
                 newCoords(latitude, longitude, dx, dy);
+
+                (void) pthread_mutex_lock(&targetLocMutex);
                 sprintf(latStr, "%f", targetLatitude);
                 sprintf(longStr, "%f", targetLongitude);
-                ////////////////////////////////////////////////////////
+                (void) pthread_mutex_unlock(&targetLocMutex);
+
                 clearDisplay();
                 setTextSize(1);
                 setTextColor(WHITE);
