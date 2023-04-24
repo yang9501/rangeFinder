@@ -57,6 +57,9 @@ double longitude = 0.0;
 double range = 0.0;
 //Compass variables
 double heading = 0.0;
+//Output variables
+double targetLatitude = 0.0;
+double targetLongitude = 0.0;
 
 //Mutexes
 pthread_mutex_t timerMutex;
@@ -139,11 +142,6 @@ void getCalStatus() {
         }
         usleep(100000);
     }
-}
-
-void polarToCartesianCoords(double r, double theta, double* x, double* y) {
-    *x = r * cos(theta);
-    *y = r * sin(theta);
 }
 
 void tiltCompensatedCompass() {
@@ -249,15 +247,6 @@ void bno055() {
 
     ////////MAIN LOGIC
     tiltCompensatedCompass();
-}
-
-double newCoords(double initLat, double initLong, double dx, double dy) {
-    //https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
-    double earthRadiusMeters = 6378 * 1000;
-    double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
-    double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
-    //printf("new lat: %f\n", newLat);
-    //printf("new long: %f\n", newLong);
 }
 
 double degreesToDecimal(double degreeCoord) {
@@ -437,7 +426,9 @@ void rangeFinder() {
             //printf("Parsed: %s\n", test_buf);
             //printf("Parsed to double: %f\n", strtod(test_buf, NULL));
             //fflush(stdout);
-            range = strtod(test_buf, NULL);
+
+            //range = strtod(test_buf, NULL);
+            range = 500;
             //////////////////////////////////
         }
     }
@@ -512,10 +503,27 @@ void printCalibrationDisplay() {
     Display();
 }
 
+void polarToCartesianCoords(double r, double theta, double* x, double* y) {
+    *x = r * cos(theta);
+    *y = r * sin(theta);
+}
+
+double newCoords(double initLat, double initLong, double dx, double dy) {
+    //https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
+    double earthRadiusMeters = 6378 * 1000;
+    double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
+    double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
+    //printf("new lat: %f\n", newLat);
+    //printf("new long: %f\n", newLong);
+}
+
 void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
     uint32_t gpioValue;
+    double dx = 0.0;
+    double dy = 0.0;
+
     printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
@@ -523,8 +531,16 @@ void getButtonPress(void *buttonPort) {
             //first press detected
             if(pressedFlag == 0) {
                 pressedFlag = 1;
-                clearDisplay();
 
+                printf("LATITUDE: %f\n", latitude);
+                printf("LONGITUDE: %f\n", longitude);
+                printf("RANGE %f\n", range);
+                printf("COMPASS: %f\n", heading);
+
+                polarToCartesianCoords(range, heading, dx, dy);
+                newCoords(latitude, longitude, dx, dy);
+
+                clearDisplay();
                 setTextSize(1);
                 setTextColor(WHITE);
                 setCursor(1, 0);
@@ -533,10 +549,6 @@ void getButtonPress(void *buttonPort) {
                 print_strln("Longitude: ");
                 print_strln("-38.567567");
                 Display();
-                printf("LATITUDE: %f\n", latitude);
-                printf("LONGITUDE: %f\n", longitude);
-                printf("RANGE %f\n", range);
-                printf("COMPASS: %f\n", heading);
             }
         }
         if(gpioValue == 0) {
