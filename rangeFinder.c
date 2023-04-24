@@ -312,7 +312,7 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        read_buf = "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+        strcpy(read_buf, "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61");
         //Apartment coords: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
         char *p = read_buf;
         p = strchr(p, ',')+6; //skip to GPS Fix Quality Indicator
