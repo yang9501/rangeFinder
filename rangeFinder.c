@@ -47,9 +47,9 @@ void tiltCompensatedCompass();
 
 ///////DATA VARIABLES
 //Calibration variables
-int gpsReadyFlag = 1;
+int gpsReadyFlag = 0;
 int rangeFinderReadyFlag = 0;
-int compassReadyFlag = 1;
+int compassReadyFlag = 0;
 //GPS variables
 double latitude = 0.0;
 double longitude = 0.0;
@@ -306,7 +306,7 @@ void parseGPSMessage(char* message) {
         latitude = degreesToDecimal(latDegrees);
         longitude = degreesToDecimal(longDegrees);
         ///////////////////////////////
-        newCoords(degreesToDecimal(latitude), degreesToDecimal(longitude), 0, -500);
+        //newCoords(degreesToDecimal(latitude), degreesToDecimal(longitude), 0, -500);
         //GOOGLE MAPS TESTING newCoords(38.8794, -77.228294, 500, -500);
     }
 }
