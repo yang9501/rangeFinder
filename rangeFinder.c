@@ -504,7 +504,7 @@ void printCalibrationDisplay() {
 }
 
 void polarToCartesianCoords(double r, double theta, double* x, double* y) {
-    double adjTheta = fmod(90 - theta + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter clockwise
+    double adjTheta = fmod(theta - 90 + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter clockwise
     *x = r * cos(adjTheta);
     *y = r * sin(adjTheta);
 }
