@@ -58,8 +58,7 @@ double range = 0.0;
 //Compass variables
 double heading = 0.0;
 
-
-
+//Mutexes
 pthread_mutex_t timerMutex;
 float timerInMilliseconds;
 
@@ -298,13 +297,15 @@ void parseGPSMessage(char* message) {
         ew = &p[0];
         printf("longitude hemisphere: %c\n", p[0]);
 
-        //////////TODO: ADD MUTEX HERE
-        latitude = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
-        longitude = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
-        ///////////////////////////////
+        double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
+        double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
+        //////////TODO: ADD MUTEX HERE
         printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
         printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
+        latitude = degreesToDecimal(latDegrees);
+        longitude = degreesToDecimal(longDegrees);
+        ///////////////////////////////
         newCoords(degreesToDecimal(latitude), degreesToDecimal(longitude), 0, -500);
         //GOOGLE MAPS TESTING newCoords(38.8794, -77.228294, 500, -500);
     }
@@ -431,9 +432,10 @@ void rangeFinder() {
             //printf("Raw data: %s\n", read_buf);
             strncpy(test_buf, read_buf + 3, 7);
             /////////////TODO: MUTEX AND INFODUMP HERE
-            printf("Parsed: %s\n", test_buf);
-            printf("Parsed to double: %f/n", strtod(test_buf, NULL));
-            fflush(stdout);
+            //printf("Parsed: %s\n", test_buf);
+            //printf("Parsed to double: %f\n", strtod(test_buf, NULL));
+            //fflush(stdout);
+            range = strtod(test_buf, NULL);
             //////////////////////////////////
         }
     }
@@ -514,6 +516,10 @@ void getButtonPress(void *buttonPort) {
     uint32_t gpioValue;
     printCalibrationDisplay();
     while(1) {
+        printf("LATITUDE: %f\n", latitude);
+        printf("LONGITUDE: %f\n", longitude);
+        printf("RANGE %f\n", range);
+        printf("COMPASS: %f\n", heading);
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
             //first press detected
