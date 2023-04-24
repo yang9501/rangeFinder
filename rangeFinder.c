@@ -171,58 +171,38 @@ void tiltCompensatedCompass() {
         //Retrieve Accelerometer data
         struct bnoacc bnodAcc;
         res = get_acc(&bnodAcc);
-        //printf("ACC %3.2f %3.2f %3.2f\n", bnodAcc.adata_x, bnodAcc.adata_y, bnodAcc.adata_z);
         //Retrieve Gyroscope data
         struct bnogyr bnodGyr;
         res = get_gyr(&bnodGyr);
-        //printf("GYR %3.2f %3.2f %3.2f\n", bnodGyr.gdata_x, bnodGyr.gdata_y, bnodGyr.gdata_z);
         //Retrieve Magnetometer data
         struct bnomag bnodMag;
         res = get_mag(&bnodMag);
-        //printf("MAG %3.2f %3.2f %3.2f\n", bnodMag.mdata_x, bnodMag.mdata_y, bnodMag.mdata_z);
 
         //Measured values normalized
-        //thetaM=-atan2(acc.x()/9.8,acc.z()/9.8)/2/3.141592654*360;
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
-        //phiM=-atan2(acc.y()/9.8,acc.z()/9.8)/2/3.141592654*360;
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
-        //printf("thetaM HEADING: %f\n", thetaM);
-        //printf("phiM HEADING: %f\n", phiM);
 
         //Low pass filter values for Gyroscope
-        //dt=(millis()-millisOld)/1000.;
         gettimeofday(&time, NULL);
         millisecondsCurr = ((double) time.tv_sec * 1000.) + ((double) time.tv_usec / 1000.);
         dt = (millisecondsCurr - millisecondsOld)/1000.;  //dt is in SECONDS
         millisecondsOld = millisecondsCurr;
-        //printf("Seconds elasped: %f\n", dt);
-        //theta=(theta+gyr.y()*dt)*.95+thetaM*.05;
+
         theta = (theta + bnodGyr.gdata_y * dt)*0.95 + thetaM * 0.05;
-        //phi=(phi-gyr.x()*dt)*.95+ phiM*.05;
         phi = (phi - bnodGyr.gdata_x * dt)*0.95 + phiM * 0.95;
-        //printf("theta HEADING: %f\n", theta);
-        //printf("phi HEADING: %f\n", phi);
+
         //Converts degrees to radians because math.h trigonometry functions wants radians.
-        //phiRad=phi/360*(2*3.14);
         phiRad = (phi/360.)*(2.*M_PI);
-        //thetaRad=theta/360*(2*3.14);
         thetaRad = (theta/360.)*(2.*M_PI);
 
         //Compensate accel/gyro tilt for magnetometer values
-        //Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);
         Xm = bnodMag.mdata_x*cos(thetaRad) - bnodMag.mdata_y*sin(phiRad)*sin(thetaRad) + bnodMag.mdata_z*cos(phiRad)*sin(thetaRad);
-        //Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);
         Ym = bnodMag.mdata_y*cos(phiRad) + bnodMag.mdata_z*sin(phiRad);
-        //printf("Xm: %f\n", Xm);
-        //printf("Ym: %f\n", Ym);
 
-        //psi=atan2(Ym,Xm)/(2*3.14)*360;
-        //Convert radians to degrees
+
         //Outputs from 0 to 180, 0 to -180.  Need to convert to 0 to 360 degrees
         //conversion: angle = (angle + 360) % 360
-        //psi = (atan2(Ym,Xm)/(2.*M_PI))*360.;
-        psi = fmod(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES
-        //printf("DEGREES HEADING: %f\n", psi);
+        psi = fmod(((360*atan2(Ym, Xm))/(2*M_PI)) + 360, 360);  //HEADING IN DEGREES CONVERTED FROM RADIANS
         ////////////TODO MUTEX HERE
         heading = psi;
         //////////////////////////
@@ -237,10 +217,6 @@ void bno055() {
     get_i2cbus(i2c_bus, senaddr);
     ////////SET MODE
     int res = set_mode(ndof_fmc);
-    if(res != 0) {
-        printf("Error: could not set sensor mode \n");
-        exit(-1);
-    }
 
     ////////CALIBRATION STATUS
     getCalStatus();
@@ -336,10 +312,9 @@ void readGPS() {
             }
         }
         /////////////TODO: MUTEX AND INFODUMP HERE
-        //parseGPSMessage(read_buf);
-        char testMessage[256] = "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
+        read_buf = "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
         //Apartment coords: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
-        char *p = testMessage;
+        char *p = read_buf;
         p = strchr(p, ',')+6; //skip to GPS Fix Quality Indicator
         if(p[0] > 0) {
             gpsReadyFlag = 1;
@@ -347,7 +322,7 @@ void readGPS() {
         else {
             continue;
         }
-        parseGPSMessage(testMessage);
+        parseGPSMessage(read_buf);
         /////////////////////////////////////
     }
 }
@@ -420,13 +395,8 @@ void rangeFinder() {
         if (n < 0) {
             printf("Unresponsive\n");
         } else {
-            //printf("Raw data: %s\n", read_buf);
             strncpy(test_buf, read_buf + 3, 7);
             /////////////TODO: MUTEX AND INFODUMP HERE
-            //printf("Parsed: %s\n", test_buf);
-            //printf("Parsed to double: %f\n", strtod(test_buf, NULL));
-            //fflush(stdout);
-
             //range = strtod(test_buf, NULL);
             range = 500;
             //////////////////////////////////
@@ -435,7 +405,6 @@ void rangeFinder() {
 }
 
 void printCalibrationDisplay() {
-    /* Initialize I2C bus and connect to the I2C Device */
     if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
     {
         printf("(Main)i2c-2: Bus Connected to SSD1306\r\n");
@@ -504,7 +473,7 @@ void printCalibrationDisplay() {
 }
 
 void polarToCartesianCoords(double r, double theta, double* x, double* y) {
-    double adjTheta = fmod(90 - theta + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter clockwise
+    double adjTheta = fmod(90 - theta + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter-clock wise
     double thetaRadians = (adjTheta*2*M_PI)/360; //Need to convert to radians because cos() and sin() expect as such
     printf("range is: %f\n", r);
     printf("heading is: %f\n", theta);
@@ -522,8 +491,6 @@ double newCoords(double initLat, double initLong, double dx, double dy) {
 
     targetLatitude = newLat;
     targetLongitude = newLong;
-    //printf("new lat: %f\n", newLat);
-    //printf("new long: %f\n", newLong);
 }
 
 void getButtonPress(void *buttonPort) {
