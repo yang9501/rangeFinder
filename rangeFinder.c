@@ -537,7 +537,7 @@ void getButtonPress(void *buttonPort) {
                 printf("RANGE %f\n", range);
                 printf("COMPASS: %f\n", heading);
 
-                polarToCartesianCoords(range, heading, dx, dy);
+                polarToCartesianCoords(range, heading, &dx, &dy);
                 newCoords(latitude, longitude, dx, dy);
 
                 clearDisplay();
