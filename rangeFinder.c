@@ -49,7 +49,7 @@ void tiltCompensatedCompass();
 //Calibration variables
 int gpsReadyFlag = 0;
 int rangeFinderReadyFlag = 0;
-int compassReadyFlag = 0;
+int compassReadyFlag = 1;
 //GPS variables
 double latitude = 0.0;
 double longitude = 0.0;
@@ -254,8 +254,8 @@ double newCoords(double initLat, double initLong, double dx, double dy) {
     double earthRadiusMeters = 6378 * 1000;
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
-    printf("new lat: %f\n", newLat);
-    printf("new long: %f\n", newLong);
+    //printf("new lat: %f\n", newLat);
+    //printf("new long: %f\n", newLong);
 }
 
 double degreesToDecimal(double degreeCoord) {
@@ -283,26 +283,26 @@ void parseGPSMessage(char* message) {
 
         p = strchr(p, ',')+1;
         latRawValue = atof(p);
-        printf("latitude: %f\n", atof(p));
+        //printf("latitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
         ns = &p[0];
-        printf("latitude hemisphere: %c\n", p[0]);
+        //printf("latitude hemisphere: %c\n", p[0]);
 
         p = strchr(p, ',')+1;
         longRawValue = atof(p);
-        printf("longitude: %f\n", atof(p));
+        //printf("longitude: %f\n", atof(p));
 
         p = strchr(p, ',')+1;
         ew = &p[0];
-        printf("longitude hemisphere: %c\n", p[0]);
+        //printf("longitude hemisphere: %c\n", p[0]);
 
         double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
         double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
         //////////TODO: ADD MUTEX HERE
-        printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
-        printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
+        //printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
+        //printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
         latitude = degreesToDecimal(latDegrees);
         longitude = degreesToDecimal(longDegrees);
         ///////////////////////////////
