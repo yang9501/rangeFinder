@@ -516,10 +516,6 @@ void getButtonPress(void *buttonPort) {
     uint32_t gpioValue;
     printCalibrationDisplay();
     while(1) {
-        printf("LATITUDE: %f\n", latitude);
-        printf("LONGITUDE: %f\n", longitude);
-        printf("RANGE %f\n", range);
-        printf("COMPASS: %f\n", heading);
         gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
             //first press detected
@@ -535,6 +531,10 @@ void getButtonPress(void *buttonPort) {
                 print_strln("Longitude: ");
                 print_strln("-38.567567");
                 Display();
+                printf("LATITUDE: %f\n", latitude);
+                printf("LONGITUDE: %f\n", longitude);
+                printf("RANGE %f\n", range);
+                printf("COMPASS: %f\n", heading);
             }
         }
         if(gpioValue == 0) {
