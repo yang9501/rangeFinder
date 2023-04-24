@@ -47,9 +47,9 @@ void tiltCompensatedCompass();
 
 ///////DATA VARIABLES
 //Calibration variables
-int gpsReadyFlag = 0;
+int gpsReadyFlag = 1;
 int rangeFinderReadyFlag = 0;
-int compassReadyFlag = 0;
+int compassReadyFlag = 1;
 //GPS variables
 double latitude = 0.0;
 double longitude = 0.0;
