@@ -457,8 +457,8 @@ void newCoords(double initLat, double initLong, double dx, double dy, double* ta
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
 
-    targetLat = newLat;
-    targetLong = newLong;
+    *targetLat = newLat;
+    *targetLong = newLong;
 }
 
 void getButtonPress(void *buttonPort) {
@@ -489,7 +489,7 @@ void getButtonPress(void *buttonPort) {
                 (void) pthread_mutex_unlock(&compassMutex);
 
                 (void) pthread_mutex_lock(&targetLocMutex);
-                newCoords(latitude, longitude, dx, dy, targetLatitude, targetLongitude);
+                newCoords(latitude, longitude, dx, dy, &targetLatitude, &targetLongitude);
                 sprintf(latStr, "%f", targetLatitude);
                 sprintf(longStr, "%f", targetLongitude);
                 (void) pthread_mutex_unlock(&targetLocMutex);
