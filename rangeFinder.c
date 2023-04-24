@@ -513,6 +513,9 @@ double newCoords(double initLat, double initLong, double dx, double dy) {
     double earthRadiusMeters = 6378 * 1000;
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
+
+    targetLatitude = newLat;
+    targetLongitude = newLong;
     //printf("new lat: %f\n", newLat);
     //printf("new long: %f\n", newLong);
 }
