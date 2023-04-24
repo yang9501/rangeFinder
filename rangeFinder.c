@@ -24,7 +24,7 @@ void getButtonPress(void *buttonPort);
 void printCalibrationDisplay();
 //GPS functions
 double degreesToDecimal(double degreeCoord);
-double newCoords(double initLat, double initLong, double dx, double dy);
+void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);
 void latLongDegToDecimal();
 void parseGPSMessage(char* message);
 void readGPS();
@@ -161,7 +161,7 @@ void tiltCompensatedCompass() {
         //Measured values normalized
         thetaM = -(atan2(bnodAcc.adata_x/9.8,bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
         phiM = -(atan2(bnodAcc.adata_y/9.8, bnodAcc.adata_z/9.8)*360.)/(2.*M_PI);
-        
+
         gettimeofday(&time, NULL);
         millisecondsCurr = ((double) time.tv_sec * 1000.) + ((double) time.tv_usec / 1000.);
         dt = (millisecondsCurr - millisecondsOld)/1000.;  //dt is in SECONDS
@@ -451,16 +451,14 @@ void polarToCartesianCoords(double r, double theta, double* x, double* y) {
     *y = r * sin(thetaRadians);
 }
 
-double newCoords(double initLat, double initLong, double dx, double dy) {
+void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong) {
     //https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
     double earthRadiusMeters = 6378 * 1000;
     double newLat = initLat + (dy/earthRadiusMeters) *  (180/M_PI);
     double newLong = initLong + ((dx/earthRadiusMeters) * (180/M_PI)/ cos(initLat * M_PI/180));
 
-    (void) pthread_mutex_lock(&targetLocMutex);
-    targetLatitude = newLat;
-    targetLongitude = newLong;
-    (void) pthread_mutex_unlock(&targetLocMutex);
+    targetLat = newLat;
+    targetLong = newLong;
 }
 
 void getButtonPress(void *buttonPort) {
@@ -490,9 +488,8 @@ void getButtonPress(void *buttonPort) {
                 (void) pthread_mutex_unlock(&rangefinderMutex);
                 (void) pthread_mutex_unlock(&compassMutex);
 
-                newCoords(latitude, longitude, dx, dy);
-
                 (void) pthread_mutex_lock(&targetLocMutex);
+                newCoords(latitude, longitude, dx, dy, targetLatitude, targetLongitude);
                 sprintf(latStr, "%f", targetLatitude);
                 sprintf(longStr, "%f", targetLongitude);
                 (void) pthread_mutex_unlock(&targetLocMutex);
