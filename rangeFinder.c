@@ -526,7 +526,8 @@ void getButtonPress(void *buttonPort) {
     uint32_t gpioValue;
     double dx = 0.0;
     double dy = 0.0;
-
+    char latStr[100];
+    char longStr[100];
     printCalibrationDisplay();
     while(1) {
         gpioValue = readGPIO("/value", (char *) buttonPort);
@@ -542,15 +543,16 @@ void getButtonPress(void *buttonPort) {
 
                 polarToCartesianCoords(range, heading, &dx, &dy);
                 newCoords(latitude, longitude, dx, dy);
-
+                sprintf(latStr, "%f", targetLatitude);
+                sprintf(longStr, "%f", targetLongitude);
                 clearDisplay();
                 setTextSize(1);
                 setTextColor(WHITE);
                 setCursor(1, 0);
-                print_strln("Latitude: ");
-                print_strln("112.123123");
-                print_strln("Longitude: ");
-                print_strln("-38.567567");
+                print_strln("Target Latitude: ");
+                print_strln(latStr);
+                print_strln("Target Longitude: ");
+                print_strln(longStr);
                 Display();
             }
         }
