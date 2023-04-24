@@ -432,7 +432,7 @@ void rangeFinder() {
             strncpy(test_buf, read_buf + 3, 7);
             /////////////TODO: MUTEX AND INFODUMP HERE
             printf("Parsed: %s\n", test_buf);
-            printf("Parsed to double: %f/n", strtod(test_buf), NULL);
+            printf("Parsed to double: %f/n", strtod(test_buf, NULL);
             fflush(stdout);
             //////////////////////////////////
         }
