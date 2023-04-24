@@ -41,20 +41,22 @@ void readGPS();
 void rangeFinder();
 
 void getCalStatus();
+void polarToCartesianCoords(double r, double theta, double* x, double* y);
 void bno055();
 void tiltCompensatedCompass();
 
 ///////DATA VARIABLES
+//Calibration variables
 int gpsReadyFlag = 0;
 int rangeFinderReadyFlag = 0;
 int compassReadyFlag = 0;
-
+//GPS variables
 double latitude = 0.0;
 double longitude = 0.0;
-
-double eul_heading = 0.0;
-double eul_roll = 0.0;
-double eul_pitch = 0.0;
+//Rangefinder variables
+double range = 0.0;
+//Compass variables
+double heading = 0.0;
 
 
 
@@ -113,11 +115,11 @@ int main(void) {
     //Button Thread
     (void) pthread_create( &thread1, &tattr1, (void*) getButtonPress, (void*) buttonPort);
     //IMU Thread
-    (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
+    //(void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
     //(void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
     //Rangefinder Thread
-    //(void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
+    (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
     (void) pthread_join(thread1, NULL);
 
 	return 0;
@@ -138,6 +140,11 @@ void getCalStatus() {
         }
         usleep(100000);
     }
+}
+
+void polarToCartesianCoords(double r, double theta, double* x, double* y) {
+    *x = r * cos(theta);
+    *y = r * sin(theta);
 }
 
 void tiltCompensatedCompass() {
@@ -291,8 +298,10 @@ void parseGPSMessage(char* message) {
         ew = &p[0];
         printf("longitude hemisphere: %c\n", p[0]);
 
-        double latitude = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
-        double longitude = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
+        //////////TODO: ADD MUTEX HERE
+        latitude = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
+        longitude = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
+        ///////////////////////////////
 
         printf("TESTING LAT: %f\n", degreesToDecimal(latitude));
         printf("TESTING LONG: %f\n", degreesToDecimal(longitude));
@@ -423,6 +432,7 @@ void rangeFinder() {
             strncpy(test_buf, read_buf + 3, 7);
             /////////////TODO: MUTEX AND INFODUMP HERE
             printf("Parsed: %s\n", test_buf);
+            printf("Parsed to double: %f/n", strtod(test_buf), NULL);
             fflush(stdout);
             //////////////////////////////////
         }
