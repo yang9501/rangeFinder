@@ -277,7 +277,7 @@ void parseGPSMessage(char* message) {
         char *ns;
         double longRawValue = 0.0;
         char *ew;
-        printf("%s\n", message);
+        //printf("%s\n", message);
         char *p = message;
         p = strchr(p, ',')+1; //skip time
 
