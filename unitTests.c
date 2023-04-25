@@ -6,11 +6,6 @@
 #include "rangefinder.c"
 #include <assert.h>
 
-void runRegressionTests();
-void testDegreesToDecimal();
-void testNewCoords();
-void testParseGPSMessage();
-void testPolarToCartesianCoords();
 
 void runRegressionTests() {
     testDegreesToDecimal();

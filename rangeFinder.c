@@ -12,6 +12,7 @@
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/SSD1306_OLED_Library/SSD1306_OLED.h"
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/I2C_Library/I2C.h"
 #include "pi-bno055-master/getbno055.h"
+#include "unitTests.h"
 
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
 
@@ -58,6 +59,7 @@ pthread_mutex_t compassMutex;
 pthread_mutex_t targetLocMutex;
 
 int main(void) {
+    runRegressionTests();
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
 
     (void) writeGPIO("/direction", buttonPort, "in");

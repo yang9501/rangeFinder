@@ -5,4 +5,10 @@
 #ifndef RANGEFINDER_UNITTESTS_H
 #define RANGEFINDER_UNITTESTS_H
 
+void runRegressionTests();
+void testDegreesToDecimal();
+void testNewCoords();
+void testParseGPSMessage();
+void testPolarToCartesianCoords();
+
 #endif //RANGEFINDER_UNITTESTS_H
