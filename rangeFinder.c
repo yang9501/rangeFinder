@@ -25,7 +25,7 @@ void printCalibrationDisplay();
 //GPS functions
 double degreesToDecimal(double degreeCoord);                                                                                 ///TESTABLE
 void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);                ///TESTABLE
-void parseGPSMessage(char* message);                                                                                         ///TESTABLE
+void parseGPSMessage(char* message, double* latResult, double* longResult);                                                                                         ///TESTABLE
 void readGPS();
 //Rangefinder function
 void rangeFinder();
