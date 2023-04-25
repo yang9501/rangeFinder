@@ -23,16 +23,15 @@ static uint32_t readGPIO(char *filename, char *port);
 void getButtonPress(void *buttonPort);
 void printCalibrationDisplay();
 //GPS functions
-double degreesToDecimal(double degreeCoord);
-void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);
-void latLongDegToDecimal();
-void parseGPSMessage(char* message);
+double degreesToDecimal(double degreeCoord);                                                                                 ///TESTABLE
+void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);                ///TESTABLE
+void parseGPSMessage(char* message);                                                                                         ///TESTABLE
 void readGPS();
 //Rangefinder function
 void rangeFinder();
 //Compass functions
 void getCalStatus();
-void polarToCartesianCoords(double r, double theta, double* x, double* y);
+void polarToCartesianCoords(double r, double theta, double* x, double* y);                                                   ///TESTABLE
 void bno055();
 void tiltCompensatedCompass();
 
@@ -218,7 +217,7 @@ double degreesToDecimal(double degreeCoord) {
     return round(absdlat + (absmlat/60) + (absslat/3600)) /1000000;
 }
 
-void parseGPSMessage(char* message) {
+void parseGPSMessage(char* message, double* latResult, double* longResult) {
     if (strstr(message, "$GNGGA") != NULL) {
         double latRawValue = 0.0;
         char *ns;
@@ -244,13 +243,11 @@ void parseGPSMessage(char* message) {
         p = strchr(p, ',')+1;
         ew = &p[0];
 
-        double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
-        double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
+        latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
+        longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
-        (void) pthread_mutex_lock(&gpsMutex);
-        latitude = degreesToDecimal(latDegrees);
-        longitude = degreesToDecimal(longDegrees);
-        (void) pthread_mutex_unlock(&gpsMutex);
+        *latResult = degreesToDecimal(latDegrees);
+        *longResult = degreesToDecimal(longDegrees);
     }
 }
 
@@ -266,7 +263,8 @@ void readGPS() {
     tcsetattr(serialPort, TCSANOW, &options);
 
     char read_buf [256];
-
+    double latResult = 0.0;
+    double longResult = 0.0;
     //////////READ FROM GPS UART SERIAL PORT
     while(1) {
         char c;
@@ -296,7 +294,11 @@ void readGPS() {
         else {
             continue;
         }
-        parseGPSMessage(read_buf);
+        parseGPSMessage(read_buf, &latResult, &longResult);
+        (void) pthread_mutex_lock(&gpsMutex);
+        latitude = latResult;
+        longitude = longResult;
+        (void) pthread_mutex_unlock(&gpsMutex);
     }
 }
 
