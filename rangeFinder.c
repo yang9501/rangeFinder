@@ -243,8 +243,8 @@ void parseGPSMessage(char* message, double* latResult, double* longResult) {
         p = strchr(p, ',')+1;
         ew = &p[0];
 
-        latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
-        longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
+        double latDegrees = (ns[0] == 'N') ? latRawValue : -1 * (latRawValue);
+        double longDegrees = (ew[0] == 'E') ? longRawValue : -1 * (longRawValue);
 
         *latResult = degreesToDecimal(latDegrees);
         *longResult = degreesToDecimal(longDegrees);
