@@ -112,6 +112,12 @@ int main(void) {
 	return 0;
 }
 
+/*
+ * Retrieves device calibration status from bno055 IMU unit and sets the ready flag if applicable.
+ *
+ * To calibrate it, align the device to the x, y, and z axis for a few seconds each.  Do some figure 8 motions to align the magnetometer.
+ *
+*/
 void getCalStatus() {
     struct bnocal bnoc;
     ////////////READ IMU SYSTEM CALIBRATION STATUS
@@ -125,8 +131,13 @@ void getCalStatus() {
     }
 }
 
+/*
+ * Retrieves data from the IMU device and implements a tilt-compensated compass, or a compass that works no matter how the device is oriented,
+ * as opposed to a compass that has to remain perfectly level at all times.
+ *
+ * Algorithm from this source: https://toptechboy.com/9-axis-imu-lesson-10-making-a-tilt-compensated-compass-with-arduino/
+*/
 void tiltCompensatedCompass() {
-    //https://toptechboy.com/9-axis-imu-lesson-10-making-a-tilt-compensated-compass-with-arduino/
     int res = 0;
 
     double thetaM;  //Measured
@@ -191,6 +202,10 @@ void tiltCompensatedCompass() {
     }
 }
 
+/*
+ * Thread function to read from the bno055 IMU device.  Checks device status.
+ *
+*/
 void bno055() {
     char senaddr[256] = "0x28";
     char i2c_bus[256] = I2CBUS;
@@ -206,6 +221,15 @@ void bno055() {
     tiltCompensatedCompass();
 }
 
+/*
+ * Given a Lat/long coordinate in degree/minute format, converts to decimal
+ *
+ * Inputs:
+ * double degreeCoord: Lat/long coordinate in degrees/minute format
+ *
+ * Outputs:
+ * return: Lat/long coordinate in decimal format
+*/
 double degreesToDecimal(double degreeCoord) {
     double ddeg;
     double sec = modf(degreeCoord, &ddeg)*60;
@@ -219,6 +243,16 @@ double degreesToDecimal(double degreeCoord) {
     return round(absdlat + (absmlat/60) + (absslat/3600)) /1000000;
 }
 
+/*
+ * Given a set of polar coordinates, returns the corresponding converted +-x, +-y offset values
+ *
+ * Inputs:
+ * char* message: Pointer to the char array containing the NMEA sentence sent from the GPS device.
+ *
+ * Outputs:
+ * double* latResult: The address used to store the parsed latitude.
+ * double* longResult: The address used to store the parsed longitude.
+*/
 void parseGPSMessage(char* message, double* latResult, double* longResult) {
     if (strstr(message, "$GNGGA") != NULL) {
         double latRawValue = 0.0;
@@ -253,6 +287,13 @@ void parseGPSMessage(char* message, double* latResult, double* longResult) {
     }
 }
 
+/*
+ * Thread function to read input from GPS device, and to check ready state of device.  Only concerned with the GNGGA type of message in NMEA formatting. Saves device output in global variable.
+ *
+ * NOTE: due to hardware limitations(signal is hard to acquire indoors,
+ * and the system setup is not convenient to transport and test outdoors), location is hardcoded
+ *
+*/
 void readGPS() {
     int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
     struct termios options;
@@ -284,9 +325,9 @@ void readGPS() {
             }
         }
         /////////////TEST DATA
+        //Test coord origin: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
         strcpy(read_buf, "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61");
         //////////////////////
-        //Test coord origin: 38°52'45.8"N 77°13'41.9"W ||||||| 38.879389, -77.228306 |||||| 3852.76334,N,07713.69836,W
         char *p = read_buf;
         p = strchr(p, ',')+6;
         //GPS readiness status check.  Skip to GPS Fix Quality Indicator, which is greater than zero when GPS fix is obtained
@@ -304,9 +345,14 @@ void readGPS() {
     }
 }
 
+/*
+ * Thread function to read and write to the Rangefinder device.  Saves device output to global variable.
+ *
+ * NOTE:  Value is currently hardcoded due to hardware limitations during testing.
+*/
 void rangeFinder() {
     unsigned char cmd1[] = { 0x80, 0x06, 0x03, 0x77 };         // Continuous Measurement Mode
-    unsigned char cmd2[] = { 0x80, 0x06, 0x07, 0x73 };
+    unsigned char cmd2[] = { 0x80, 0x06, 0x07, 0x73 };          //Single Measurement Mode
     unsigned char cmd3[] = { 0x80, 0x06, 0x05, 0x01, 0x74 };   // LaserPointerOn
     unsigned char cmd4[] = { 0x80, 0x06, 0x05, 0x00, 0x75 };   // LaserPointerOff
 
@@ -373,12 +419,16 @@ void rangeFinder() {
 
             (void) pthread_mutex_lock(&rangefinderMutex);
             //range = strtod(test_buf, NULL);
+            //Hardcoded rangeFinder distance value due to testing limitations.
             range = 500;
             (void) pthread_mutex_unlock(&rangefinderMutex);
         }
     }
 }
 
+/*
+ * Connects to the display.  Queries and displays device status.
+*/
 void printCalibrationDisplay() {
     if(init_i2c_dev(I2C_DEV2_PATH, SSD1306_OLED_ADDR) == 0)
     {
@@ -444,6 +494,17 @@ void printCalibrationDisplay() {
     Display();
 }
 
+/*
+ * Given a set of polar coordinates, returns the corresponding converted +-x, +-y offset values
+ *
+ * Inputs:
+ * double r: Magnitude of polar vector in meters.  Uses the distance measurement from the rangefinder
+ * double theta: Heading of polar vector in degrees.  Uses the heading measurement from the IMU compass
+ *
+ * Outputs:
+ * double* x: The address used to put the x offset value in meters.
+ * double* y: The address used to put the y offset value in meters.
+*/
 void polarToCartesianCoords(double r, double theta, double* x, double* y) {
     double adjTheta = fmod(90 - theta + 360, 360); //Since polar coordinates are x = 0 heading, have to rotate by 90 degrees counter-clock wise
     double thetaRadians = (adjTheta*2*M_PI)/360; //Need to convert to radians because cos() and sin() expect as such
@@ -455,6 +516,19 @@ void polarToCartesianCoords(double r, double theta, double* x, double* y) {
     *y = r * sin(thetaRadians);
 }
 
+/*
+ * Given your current position and an x and y offset, calculates the new coordinates
+ *
+ * Inputs:
+ * double initLat: the current latitude of the GPS device in decimal format
+ * double initLong: the current longitude of the GPS device in decimal format
+ * double dx: the +-x offset value in meters to calculate from the current position.
+ * double dy: the +-y offset value in meters to calculate from the current position.
+ *
+ * Outputs:
+ * double* targetLat: the latitude of the target in decimal format
+ * double* targetLong: the longitude of the target in decimal format
+*/
 void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong) {
     //https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
     double earthRadiusMeters = 6378 * 1000;
@@ -465,6 +539,11 @@ void newCoords(double initLat, double initLong, double dx, double dy, double* ta
     *targetLong = newLong;
 }
 
+/*
+ * Thread function to receive button input and write output to the display
+ * Inputs:
+ * void* buttonPort: address of the button GPIO port
+*/
 void getButtonPress(void *buttonPort) {
     uint32_t pressedFlag = 0;
     uint32_t signalSentFlag = 0;
