@@ -28,8 +28,8 @@ void testNewCoords() {
     newCoords(38.879389, -77.228306, 0, -500, &targetLat, &targetLong);
     printf("targetLat: %f\n", targetLat);
     printf("targetLong: %f\n", targetLong);
-    assert(targetLat == 38.874897);
-    assert(targetLong == -77.228306);
+    assert(targetLat == (double) 38.874897);
+    assert(targetLong == (double) -77.228306);
 }
 
 void testParseGPSMessage() {
