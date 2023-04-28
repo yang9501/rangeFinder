@@ -3,7 +3,7 @@
 //
 
 #include "unitTests.h"
-#include "rangefinder.h"
+#include "rangeFinder.h"
 #include <assert.h>
 
 
