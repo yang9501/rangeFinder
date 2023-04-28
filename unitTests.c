@@ -31,8 +31,6 @@ void testNewCoords() {
     double targetLat = 0.0;
     double targetLong = 0.0;
     newCoords(38.879389, -77.228306, 0, -500, &targetLat, &targetLong);
-    printf("targetLat: %f\n", targetLat);
-    printf("targetLong: %f\n", targetLong);
     assert(compare_float(targetLat, 38.874897, 0.000001f) == 1);
     assert(compare_float(targetLong, -77.228306, 0.000001f) == 1);
 }
