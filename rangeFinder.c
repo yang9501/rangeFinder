@@ -45,7 +45,7 @@ pthread_mutex_t compassMutex;
 pthread_mutex_t targetLocMutex;
 
 int main(void) {
-    //runRegressionTests();
+    runRegressionTests();
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
 
     (void) writeGPIO("/direction", buttonPort, "in");
