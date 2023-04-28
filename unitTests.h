@@ -2,6 +2,7 @@
 // Created by Justin Yang on 4/24/23.
 //
 
+#include "rangefinder.h"
 #ifndef RANGEFINDER_UNITTESTS_H
 #define RANGEFINDER_UNITTESTS_H
 
