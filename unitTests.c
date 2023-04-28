@@ -19,7 +19,7 @@ void testDegreesToDecimal() {
     assert(val == 38.879389);
 
     val = degreesToDecimal(07713.69836);
-    assert(val == -77.228306);
+    assert(val == 77.228306);
 }
 
 void testNewCoords() {
