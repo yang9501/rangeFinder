@@ -12,10 +12,10 @@
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/SSD1306_OLED_Library/SSD1306_OLED.h"
 #include "SSD1306-OLED-display-driver-for-BeagleBone-master/I2C_Library/I2C.h"
 #include "pi-bno055-master/getbno055.h"
-//#include "unitTests.h"
+#include "unitTests.h"
 
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
-
+/*
 //Writes specified value to specified GPIO directory
 static void writeGPIO(char *filename, char *port, char *value);
 //Reads input to GPIO pin
@@ -35,7 +35,7 @@ void getCalStatus();
 void polarToCartesianCoords(double r, double theta, double* x, double* y);                                                   ///TESTABLE
 void bno055();
 void tiltCompensatedCompass();
-
+*/
 ///////DATA VARIABLES
 //Calibration variables
 int gpsReadyFlag = 0;

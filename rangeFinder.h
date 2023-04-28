@@ -3,8 +3,7 @@
 //
 
 #ifndef RANGEFINDER_RANGEFINDER_H
-#define RANGEFINDER_RANGEFINDER_H
-//Writes specified value to specified GPIO directory
+#define RANGEFINDER_RANGEFINDER_H//Writes specified value to specified GPIO directory
 static void writeGPIO(char *filename, char *port, char *value);
 //Reads input to GPIO pin
 static uint32_t readGPIO(char *filename, char *port);
