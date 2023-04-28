@@ -34,7 +34,7 @@ void testNewCoords() {
     printf("targetLat: %f\n", targetLat);
     printf("targetLong: %f\n", targetLong);
     assert(compare_float(targetLat, 38.874897, 0.000001f) == 1);
-    assert(targetLong == -77.228306);
+    assert(compare_float(targetLong, -77.228306, 0.000001f) == 1);
 }
 
 void testParseGPSMessage() {
@@ -43,8 +43,8 @@ void testParseGPSMessage() {
     char* testNMEASentence = "$GNGGA,202530.00,3852.76334,N,07713.69836,W,0,40,0.5,1097.36,M,-17.00,M,18,TSTR*61";
     parseGPSMessage(testNMEASentence, &latResult, &longResult);
 
-    assert(latResult == 38.879389);
-    assert(longResult == -77.228306);
+    assert(compare_float(latResult, 38.879389, 0.000001f) == 1);
+    assert(compare_float(longResult, -77.228306, 0.000001f) == 1);
 }
 
 void testPolarToCartesianCoords() {
@@ -52,6 +52,6 @@ void testPolarToCartesianCoords() {
     double yOffset = 0.0;
     polarToCartesianCoords(500, 0, &xOffset, &yOffset);
 
-    assert(xOffset == 0.0);
-    assert(yOffset == 500);
+    assert(compare_float(xOffset, 0.0, 0.000001f) == 1);
+    assert(compare_float(yOffset, 500, 0.000001f) == 1);
 }
