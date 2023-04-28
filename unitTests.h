@@ -4,7 +4,7 @@
 
 #ifndef RANGEFINDER_UNITTESTS_H
 #define RANGEFINDER_UNITTESTS_H
-
+bool compare_float(double x, double y, double epsilon);
 void runRegressionTests();
 void testDegreesToDecimal();
 void testNewCoords();
