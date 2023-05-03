@@ -6,6 +6,22 @@
 #include "rangeFinder.h"
 #include <assert.h>
 
+void resetGlobalVariables() {
+    gpsReadyFlag = 0;
+    rangeFinderReadyFlag = 0;
+    compassReadyFlag = 0;
+//GPS variables
+    latitude = 0.0;
+    longitude = 0.0;
+//Rangefinder variables
+    range = 0.0;
+//Compass variables
+    heading = 0.0;
+//Output variables
+    targetLatitude = 0.0;
+    targetLongitude = 0.0;
+}
+
 int compare_float(double x, double y, double epsilon) {
     if(fabs(x - y) < epsilon)
         return 1; //they are same
@@ -52,4 +68,22 @@ void testPolarToCartesianCoords() {
 
     assert(compare_float(xOffset, 0.0, 0.000001f) == 1);
     assert(compare_float(yOffset, 500, 0.000001f) == 1);
+}
+
+void testGPS() {
+    readGPS("gpsTestData.txt");
+    assert(gpsReadyFlag == 1);
+    assert(compare_float(latitude, 38.879389, 0.000001f) == 1);
+    assert(compare_float(longitude, -77.228306, 0.000001f) == 1);
+
+    resetGlobalVariables();
+}
+
+void testGPSUnready() {
+    readGPS("gpsTestDataUnready.txt");
+    assert(gpsReadyFlag == 0);
+    assert(compare_float(latitude, 0.0, 0.000001f) == 1);
+    assert(compare_float(longitude, 0.0, 0.000001f) == 1);
+
+    resetGlobalVariables();
 }

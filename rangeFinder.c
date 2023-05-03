@@ -1,28 +1,10 @@
 #include "rangeFinder.h"
 
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
-/*
-//Writes specified value to specified GPIO directory
-static void writeGPIO(char *filename, char *port, char *value);
-//Reads input to GPIO pin
-static uint32_t readGPIO(char *filename, char *port);
-//Primary button press detection
-void getButtonPress(void *buttonPort);
-void printCalibrationDisplay();
-//GPS functions
-double degreesToDecimal(double degreeCoord);                                                                                 ///TESTABLE
-void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);                ///TESTABLE
-void parseGPSMessage(char* message, double* latResult, double* longResult);                                                                                         ///TESTABLE
-void readGPS();
-//Rangefinder function
-void rangeFinder();
-//Compass functions
-void getCalStatus();
-void polarToCartesianCoords(double r, double theta, double* x, double* y);                                                   ///TESTABLE
-void bno055();
-void tiltCompensatedCompass();
-*/
+#define GPS_PATH "/dev/ttyS1"
+
 ///////DATA VARIABLES
+/*
 //Calibration variables
 int gpsReadyFlag = 0;
 int rangeFinderReadyFlag = 0;
@@ -37,7 +19,7 @@ double heading = 0.0;
 //Output variables
 double targetLatitude = 0.0;
 double targetLongitude = 0.0;
-
+*/
 //Mutexes
 pthread_mutex_t gpsMutex;
 pthread_mutex_t rangefinderMutex;
@@ -47,6 +29,7 @@ pthread_mutex_t targetLocMutex;
 int main(void) {
     runRegressionTests();
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
+    char gpsPort[25] = GPS_PATH
 
     (void) writeGPIO("/direction", buttonPort, "in");
 
@@ -72,11 +55,12 @@ int main(void) {
 
     //Button priority is highest
     param1.sched_priority = 90;
-    param2.sched_priority = 90;
+    //Compass requires updates
+    param2.sched_priority = 80;
     //Timer update thread is second highest
     param3.sched_priority = 80;
     //Display output has lowest priority
-    param4.sched_priority = 20;
+    param4.sched_priority = 80;
 
     pthread_attr_setschedparam(&tattr1, &param1);
     pthread_attr_setschedparam(&tattr2, &param2);
@@ -88,7 +72,7 @@ int main(void) {
     //Compass Thread
     (void) pthread_create( &thread2, &tattr2, (void *) bno055, NULL);
     //GPS Thread
-    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, NULL);
+    (void) pthread_create( &thread3, &tattr3, (void *) readGPS, (void*) gpsPort);
     //Rangefinder Thread
     (void) pthread_create( &thread4, &tattr4, (void *) rangeFinder, NULL);
 
@@ -280,16 +264,16 @@ void parseGPSMessage(char* message, double* latResult, double* longResult) {
  * and the system setup is not convenient to transport and test outdoors), location is hardcoded
  *
 */
-void readGPS() {
-    int serialPort = open("/dev/ttyS1", O_RDWR | O_NOCTTY);
+void readGPS(void *serialPort) {
+    int gpsSerialPort = open((char *) buttonPort, O_RDWR | O_NOCTTY);
     struct termios options;
-    tcgetattr(serialPort, &options);
+    tcgetattr(gpsSerialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR | ICRNL | IGNCR;
     options.c_oflag = 0;
     options.c_lflag = 0;
-    tcflush(serialPort, TCIFLUSH);
-    tcsetattr(serialPort, TCSANOW, &options);
+    tcflush(gpsSerialPort, TCIFLUSH);
+    tcsetattr(gpsSerialPort, TCSANOW, &options);
 
     char read_buf [256];
     double latResult = 0.0;
@@ -299,7 +283,7 @@ void readGPS() {
         char c;
         char *b = read_buf;
         while(1) {
-            int n = read(serialPort, (void *) (&c), 1);
+            int n = read(gpsSerialPort, (void *) (&c), 1);
             if (n < 0) {
 
             } else {
@@ -464,7 +448,6 @@ void printCalibrationDisplay() {
         }
         Display();
         if(gpsReadyFlag == 1 && rangeFinderReadyFlag == 1 && compassReadyFlag == 1) {
-            //printf("BREAKING\n");
             sleep(2);
             break;
         }

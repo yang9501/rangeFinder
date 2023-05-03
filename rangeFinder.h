@@ -18,6 +18,19 @@
 #include "unitTests.h"
 #ifndef RANGEFINDER_RANGEFINDER_H
 #define RANGEFINDER_RANGEFINDER_H//Writes specified value to specified GPIO directory
+int gpsReadyFlag = 0;
+int rangeFinderReadyFlag = 0;
+int compassReadyFlag = 0;
+//GPS variables
+double latitude = 0.0;
+double longitude = 0.0;
+//Rangefinder variables
+double range = 0.0;
+//Compass variables
+double heading = 0.0;
+//Output variables
+double targetLatitude = 0.0;
+double targetLongitude = 0.0;
 static void writeGPIO(char *filename, char *port, char *value);
 //Reads input to GPIO pin
 static uint32_t readGPIO(char *filename, char *port);
@@ -28,7 +41,7 @@ void printCalibrationDisplay();
 double degreesToDecimal(double degreeCoord);                                                                                 ///TESTABLE
 void newCoords(double initLat, double initLong, double dx, double dy, double* targetLat, double* targetLong);                ///TESTABLE
 void parseGPSMessage(char* message, double* latResult, double* longResult);                                                                                         ///TESTABLE
-void readGPS();
+void readGPS(void *serialPort);
 //Rangefinder function
 void rangeFinder();
 //Compass functions
