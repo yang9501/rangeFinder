@@ -284,11 +284,13 @@ void readGPS(void *serialPort) {
         char c;
         char *b = read_buf;
         while(1) {
+            printf("READING");
             int n = read(gpsSerialPort, (void *) (&c), 1);
             if (n < 0) {
 
             } else {
                 if (c == '\n') {
+                    printf("ENDING");
                     *b++ = '\0';
                     break;
                 }
