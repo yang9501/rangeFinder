@@ -289,7 +289,7 @@ void readGPS(void *serialPort) {
 
             } else {
                 printf("c: %c\n", c);
-                if (c == '*') {
+                if (c == '\n') {
                     printf("ENDING");
                     *b++ = '\0';
                     break;
@@ -305,6 +305,7 @@ void readGPS(void *serialPort) {
         p = strchr(p, ',')+6;
         //GPS readiness status check.  Skip to GPS Fix Quality Indicator, which is greater than zero when GPS fix is obtained
         if(p[0] > 0) {
+            printf("p[0]: %c\n",p[0]);
             gpsReadyFlag = 1;
         }
         else {
