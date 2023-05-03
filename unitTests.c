@@ -71,8 +71,9 @@ void testPolarToCartesianCoords() {
     assert(compare_float(yOffset, 500, 0.000001f) == 1);
 }
 
+//TEST NOT WORKING, WHILE LOOP RESULTING IN INFINITE RUNTIME WITH NO STOP CONDITION
 void testGPS() {
-    readGPS("gpsTestData.txt");
+    readGPS("testData/gpsTestData.txt");
     assert(gpsReadyFlag == 1);
     assert(compare_float(latitude, 38.879389, 0.000001f) == 1);
     assert(compare_float(longitude, -77.228306, 0.000001f) == 1);
@@ -80,8 +81,9 @@ void testGPS() {
     resetGlobalVariables();
 }
 
+//TEST NOT WORKING
 void testGPSUnready() {
-    readGPS("gpsTestDataUnready.txt");
+    readGPS("testData/gpsTestDataUnready.txt");
     assert(gpsReadyFlag == 0);
     assert(compare_float(latitude, 0.0, 0.000001f) == 1);
     assert(compare_float(longitude, 0.0, 0.000001f) == 1);
