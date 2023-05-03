@@ -9,15 +9,15 @@ gpsReadyFlag = 0;
 rangeFinderReadyFlag = 0;
 compassReadyFlag = 0;
 //GPS variables
-latitude = 0.0;
-longitude = 0.0;
+latitude = (double) 0.0;
+longitude = (double) 0.0;
 //Rangefinder variables
-range = 0.0;
+range = (double) 0.0;
 //Compass variables
-heading = 0.0;
+heading = (double) 0.0;
 //Output variables
-targetLatitude = 0.0;
-targetLongitude = 0.0;
+targetLatitude = (double) 0.0;
+targetLongitude = (double) 0.0;
 */
 //Mutexes
 pthread_mutex_t gpsMutex;
