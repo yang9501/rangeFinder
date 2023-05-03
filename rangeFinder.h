@@ -18,19 +18,19 @@
 #include "unitTests.h"
 #ifndef RANGEFINDER_RANGEFINDER_H
 #define RANGEFINDER_RANGEFINDER_H//Writes specified value to specified GPIO directory
-int gpsReadyFlag = 0;
-int rangeFinderReadyFlag = 0;
-int compassReadyFlag = 0;
+int gpsReadyFlag;
+int rangeFinderReadyFlag;
+int compassReadyFlag;
 //GPS variables
-double latitude = 0.0;
-double longitude = 0.0;
+double latitude;
+double longitude;
 //Rangefinder variables
-double range = 0.0;
+double range;
 //Compass variables
-double heading = 0.0;
+double heading;
 //Output variables
-double targetLatitude = 0.0;
-double targetLongitude = 0.0;
+double targetLatitude;
+double targetLongitude;
 static void writeGPIO(char *filename, char *port, char *value);
 //Reads input to GPIO pin
 static uint32_t readGPIO(char *filename, char *port);
