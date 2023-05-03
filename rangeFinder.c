@@ -4,22 +4,6 @@
 #define GPS_PATH "/dev/ttyS1"
 
 ///////DATA VARIABLES
-/*
-//Calibration variables
-int gpsReadyFlag = 0;
-int rangeFinderReadyFlag = 0;
-int compassReadyFlag = 0;
-//GPS variables
-double latitude = 0.0;
-double longitude = 0.0;
-//Rangefinder variables
-double range = 0.0;
-//Compass variables
-double heading = 0.0;
-//Output variables
-double targetLatitude = 0.0;
-double targetLongitude = 0.0;
-*/
 //Mutexes
 pthread_mutex_t gpsMutex;
 pthread_mutex_t rangefinderMutex;
