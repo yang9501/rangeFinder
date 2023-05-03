@@ -288,7 +288,7 @@ void readGPS(void *serialPort) {
             if (n < 0) {
 
             } else {
-                printf("n: %c\n", n);
+                printf("c: %c\n", c);
                 if (c == '\n') {
                     printf("ENDING");
                     *b++ = '\0';
