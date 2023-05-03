@@ -3,21 +3,7 @@
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Start/Stop Button
 #define GPS_PATH "/dev/ttyS1"
 
-///////DATA VARIABLES
-//Calibration variables
-gpsReadyFlag = 0;
-rangeFinderReadyFlag = 0;
-compassReadyFlag = 0;
-//GPS variables
-latitude = 0.0;
-longitude = 0.0;
-//Rangefinder variables
-range = 0.0;
-//Compass variables
-heading = 0.0;
-//Output variables
-targetLatitude = 0.0;
-targetLongitude = 0.0;
+
 //Mutexes
 pthread_mutex_t gpsMutex;
 pthread_mutex_t rangefinderMutex;
@@ -25,8 +11,25 @@ pthread_mutex_t compassMutex;
 pthread_mutex_t targetLocMutex;
 
 int main(void) {
+    ///////DATA VARIABLES
+    //Calibration variables
+    gpsReadyFlag = 0;
+    rangeFinderReadyFlag = 0;
+    compassReadyFlag = 0;
+    //GPS variables
+    latitude = 0.0;
+    longitude = 0.0;
+    //Rangefinder variables
+    range = 0.0;
+    //Compass variables
+    heading = 0.0;
+    //Output variables
+    targetLatitude = 0.0;
+    targetLongitude = 0.0;
+
     runRegressionTests();
-	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
+
+    char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
     char gpsPort[25] = GPS_PATH;
 
     (void) writeGPIO("/direction", buttonPort, "in");
