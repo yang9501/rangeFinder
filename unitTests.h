@@ -10,5 +10,6 @@ void testDegreesToDecimal();
 void testNewCoords();
 void testParseGPSMessage();
 void testPolarToCartesianCoords();
+void testGPS();
 
 #endif //RANGEFINDER_UNITTESTS_H

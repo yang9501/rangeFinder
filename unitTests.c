@@ -33,6 +33,7 @@ void runRegressionTests() {
     testNewCoords();
     testParseGPSMessage();
     testPolarToCartesianCoords();
+    testGPS();
 }
 
 void testDegreesToDecimal() {
