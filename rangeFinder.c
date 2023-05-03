@@ -29,7 +29,7 @@ pthread_mutex_t targetLocMutex;
 int main(void) {
     runRegressionTests();
 	char buttonPort[25] = GPIO_PATH_66; //buttonPorts[0] is the start/stop
-    char gpsPort[25] = GPS_PATH
+    char gpsPort[25] = GPS_PATH;
 
     (void) writeGPIO("/direction", buttonPort, "in");
 
@@ -265,7 +265,7 @@ void parseGPSMessage(char* message, double* latResult, double* longResult) {
  *
 */
 void readGPS(void *serialPort) {
-    int gpsSerialPort = open((char *) buttonPort, O_RDWR | O_NOCTTY);
+    int gpsSerialPort = open((char *) serialPort, O_RDWR | O_NOCTTY);
     struct termios options;
     tcgetattr(gpsSerialPort, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
